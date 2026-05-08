@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+python-multipart
+pandas
+openpyxl
+reportlab
+python-jose[cryptography]
+passlib[bcrypt]
+# sqlite-browser removed (not a pip package)

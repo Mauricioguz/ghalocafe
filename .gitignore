@@ -1,0 +1,24 @@
+# Node
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# Database
+*.db
+*.sqlite3
+la_leonora.db
+
+# OS
+.DS_Store
+Thumbs.db
