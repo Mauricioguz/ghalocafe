@@ -9,3 +9,4 @@ reportlab
 python-jose[cryptography]
 passlib[bcrypt]
 # sqlite-browser removed (not a pip package)
+psycopg2-binary
