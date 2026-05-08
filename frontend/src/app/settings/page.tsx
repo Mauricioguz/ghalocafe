@@ -13,7 +13,7 @@ export default function SettingsPage() {
   const [editingProdId, setEditingProdId] = useState<number | null>(null);
   
   const [showCatForm, setShowCatForm] = useState(false);
-  const [newCategoria, setNewCategoria] = useState({ nombre: '', tipo_defecto: 'Variable' });
+  const [newCategoria, setNewCategoria] = useState({ nombre: '', tipo_defecto: 'Variable', clasificacion_contable: 'Costo de Producción' });
   const [editingCatId, setEditingCatId] = useState<number | null>(null);
 
   const [config, setConfig] = useState({
@@ -85,7 +85,7 @@ export default function SettingsPage() {
       }
       setShowCatForm(false);
       setEditingCatId(null);
-      setNewCategoria({ nombre: '', tipo_defecto: 'Variable' });
+      setNewCategoria({ nombre: '', tipo_defecto: 'Variable', clasificacion_contable: 'Costo de Producción' });
       loadData();
     } catch (error) {
       alert("Error guardando categoría.");
@@ -93,7 +93,7 @@ export default function SettingsPage() {
   };
 
   const handleEditCat = (cat: any) => {
-    setNewCategoria({ nombre: cat.nombre, tipo_defecto: cat.tipo_defecto });
+    setNewCategoria({ nombre: cat.nombre, tipo_defecto: cat.tipo_defecto, clasificacion_contable: cat.clasificacion_contable || 'Costo de Producción' });
     setEditingCatId(cat.id);
     setShowCatForm(true);
   };
@@ -225,7 +225,7 @@ export default function SettingsPage() {
                   <Tag className="w-5 h-5 text-red-600" />
                   Categorías Egresos
                 </h3>
-                <button onClick={() => { setShowCatForm(true); setEditingCatId(null); setNewCategoria({ nombre: '', tipo_defecto: 'Variable' }); }} className="btn-primary !bg-red-600 hover:!bg-red-700 py-1 px-3 text-sm flex items-center gap-1">
+                <button onClick={() => { setShowCatForm(true); setEditingCatId(null); setNewCategoria({ nombre: '', tipo_defecto: 'Variable', clasificacion_contable: 'Costo de Producción' }); }} className="btn-primary !bg-red-600 hover:!bg-red-700 py-1 px-3 text-sm flex items-center gap-1">
                   <Plus className="w-4 h-4" /> Nueva
                 </button>
               </div>
