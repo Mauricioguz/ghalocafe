@@ -195,8 +195,8 @@ export default function IngresosPage() {
               <input 
                 type="number" 
                 required
-                step="0.01"
-                placeholder="0.00" 
+                step="any"
+                placeholder="0.0" 
                 className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--primary)] outline-none" 
                 value={Number.isNaN(formData.cantidad) ? '' : formData.cantidad}
                 onChange={e => setFormData({...formData, cantidad: parseFloat(e.target.value)})}
@@ -210,7 +210,8 @@ export default function IngresosPage() {
               <input 
                 type="number" 
                 required
-                placeholder="$0.00" 
+                step="any"
+                placeholder="$0.0" 
                 className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--primary)] outline-none" 
                 value={Number.isNaN(formData.precio_unitario) ? '' : formData.precio_unitario}
                 onChange={e => setFormData({...formData, precio_unitario: parseFloat(e.target.value)})}
@@ -253,7 +254,7 @@ export default function IngresosPage() {
                     </td>
                     <td className="py-4 text-[var(--primary)]">{ing.producto?.nombre || 'N/A'}</td>
                     <td className="py-4 text-sm">{ing.cantidad} {ing.producto?.unidad || ''}</td>
-                    <td className="py-4 text-right font-bold text-green-700">${ing.total?.toLocaleString()}</td>
+                    <td className="py-4 text-right font-bold text-green-700">${ing.total?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
                     <td className="py-4 flex justify-end gap-2">
                       <button onClick={() => handleEdit(ing)} className="p-1.5 text-gray-400 hover:text-blue-600 bg-white rounded-md shadow-sm border border-gray-100"><Edit2 className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(ing.id)} className="p-1.5 text-gray-400 hover:text-red-600 bg-white rounded-md shadow-sm border border-gray-100"><Trash2 className="w-4 h-4" /></button>

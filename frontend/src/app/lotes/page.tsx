@@ -140,10 +140,11 @@ export default function LotesPage() {
                   <label className="text-sm font-medium text-gray-700">Hectáreas</label>
                   <input 
                     type="number" 
-                    step="0.1" 
+                    step="any" 
                     required
+                    placeholder="0.0"
                     className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[var(--primary)]"
-                    value={newLote.hectareas}
+                    value={Number.isNaN(newLote.hectareas) ? '' : newLote.hectareas}
                     onChange={e => setNewLote({...newLote, hectareas: parseFloat(e.target.value)})}
                   />
                 </div>

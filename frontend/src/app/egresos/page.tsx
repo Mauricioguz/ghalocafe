@@ -236,7 +236,8 @@ export default function EgresosPage() {
               <input 
                 type="number" 
                 required
-                placeholder="$0" 
+                step="any"
+                placeholder="$0.0" 
                 className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-bold text-lg" 
                 value={Number.isNaN(formData.valor) ? '' : formData.valor}
                 onChange={e => setFormData({...formData, valor: parseFloat(e.target.value)})}
@@ -298,7 +299,7 @@ export default function EgresosPage() {
                           {eg.categoria}
                         </span>
                       </td>
-                      <td className="py-4 text-right font-bold text-red-600">-${eg.valor?.toLocaleString()}</td>
+                      <td className="py-4 text-right font-bold text-red-600">-${eg.valor?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
                       <td className="py-4 flex justify-center gap-2">
                         <button onClick={() => handleEdit(eg)} className="p-1.5 text-gray-400 hover:text-blue-600 bg-white rounded-md shadow-sm border border-gray-100"><Edit2 className="w-4 h-4" /></button>
                         <button onClick={() => handleDelete(eg.id)} className="p-1.5 text-gray-400 hover:text-red-600 bg-white rounded-md shadow-sm border border-gray-100"><Trash2 className="w-4 h-4" /></button>
@@ -322,7 +323,7 @@ export default function EgresosPage() {
                <DollarSign className="w-4 h-4 text-green-400" /> Presupuesto Ejecutado
             </h4>
             <div className="flex justify-between items-end">
-              <p className="text-4xl font-black text-white tracking-tight">${egresos.reduce((acc, curr) => acc + curr.valor, 0).toLocaleString()}</p>
+              <p className="text-4xl font-black text-white tracking-tight">${egresos.reduce((acc, curr) => acc + curr.valor, 0).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
             </div>
             <div className="mt-4 pt-4 border-t border-gray-700">
               <p className="text-xs text-gray-400">Total acumulado histórico</p>

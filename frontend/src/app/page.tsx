@@ -123,7 +123,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Ingresos Totales</p>
-              <p className="text-3xl font-bold text-gray-800">${stats?.total_ingresos?.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-gray-800">${stats?.total_ingresos?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
             </div>
             <div className="bg-green-100 p-3 rounded-2xl text-green-700 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
               <TrendingUp className="w-6 h-6" />
@@ -135,7 +135,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Costos Totales</p>
-              <p className="text-3xl font-bold text-gray-800">${stats?.total_egresos?.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-gray-800">${stats?.total_egresos?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
             </div>
             <div className="bg-red-100 p-3 rounded-2xl text-red-700 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
               <TrendingDown className="w-6 h-6" />
@@ -147,7 +147,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Utilidad Neta</p>
-              <p className="text-3xl font-bold text-[var(--primary)]">${stats?.utilidad_neta?.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-[var(--primary)]">${stats?.utilidad_neta?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
             </div>
             <div className="bg-blue-100 p-3 rounded-2xl text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
               <Wallet className="w-6 h-6" />
@@ -180,38 +180,38 @@ export default function Dashboard() {
             <div className="space-y-3">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-800 font-bold">Ingresos Operacionales</span>
-                <span className="font-bold text-emerald-600">${stats?.pyg_consolidado?.ingresos_operacionales?.toLocaleString()}</span>
+                <span className="font-bold text-emerald-600">${stats?.pyg_consolidado?.ingresos_operacionales?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100 pl-4">
                 <span className="text-gray-500">(-) Costos de Producción</span>
-                <span className="font-semibold text-rose-500">${stats?.pyg_consolidado?.costos_produccion?.toLocaleString()}</span>
+                <span className="font-semibold text-rose-500">${stats?.pyg_consolidado?.costos_produccion?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b-2 border-gray-200 bg-gray-50/50 rounded-lg px-2">
                 <span className="text-gray-800 font-bold">(=) Utilidad Bruta</span>
-                <span className="font-bold text-blue-600">${stats?.pyg_consolidado?.utilidad_bruta?.toLocaleString()}</span>
+                <span className="font-bold text-blue-600">${stats?.pyg_consolidado?.utilidad_bruta?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-gray-100 pl-4">
                 <span className="text-gray-500 text-sm">(-) Gastos Administrativos</span>
-                <span className="font-semibold text-rose-500 text-sm">${stats?.pyg_consolidado?.gastos_administrativos?.toLocaleString()}</span>
+                <span className="font-semibold text-rose-500 text-sm">${stats?.pyg_consolidado?.gastos_administrativos?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-gray-100 pl-4">
                 <span className="text-gray-500 text-sm">(-) Gastos de Ventas</span>
-                <span className="font-semibold text-rose-500 text-sm">${stats?.pyg_consolidado?.gastos_ventas?.toLocaleString()}</span>
+                <span className="font-semibold text-rose-500 text-sm">${stats?.pyg_consolidado?.gastos_ventas?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b-2 border-gray-200 bg-gray-50/50 rounded-lg px-2">
                 <span className="text-gray-800 font-bold">(=) Utilidad Operacional</span>
-                <span className="font-bold text-blue-600">${stats?.pyg_consolidado?.utilidad_operacional?.toLocaleString()}</span>
+                <span className="font-bold text-blue-600">${stats?.pyg_consolidado?.utilidad_operacional?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-gray-100 pl-4">
                 <span className="text-gray-500 text-sm">(-) Gastos Financieros</span>
-                <span className="font-semibold text-rose-500 text-sm">${stats?.pyg_consolidado?.gastos_financieros?.toLocaleString()}</span>
+                <span className="font-semibold text-rose-500 text-sm">${stats?.pyg_consolidado?.gastos_financieros?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
               </div>
             </div>
           </div>
           
           <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl border border-green-100 flex justify-between items-center">
             <span className="text-lg font-black text-green-900 uppercase tracking-wider">Utilidad Neta</span>
-            <span className="text-2xl font-black text-green-700">${stats?.pyg_consolidado?.utilidad_neta?.toLocaleString()}</span>
+            <span className="text-2xl font-black text-green-700">${stats?.pyg_consolidado?.utilidad_neta?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
           </div>
         </div>
 
@@ -316,8 +316,8 @@ export default function Dashboard() {
                 return (
                   <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                     <td className="py-4 px-4 font-bold text-gray-700">{lote.name}</td>
-                    <td className="py-4 px-4 text-emerald-600 font-semibold text-right">${lote.ingresos.toLocaleString()}</td>
-                    <td className="py-4 px-4 text-rose-600 font-semibold text-right">${lote.egresos.toLocaleString()}</td>
+                    <td className="py-4 px-4 text-emerald-600 font-semibold text-right">${lote.ingresos.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                    <td className="py-4 px-4 text-rose-600 font-semibold text-right">${lote.egresos.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
                     <td className="py-4 px-4 text-center">
                       <span className={`px-3 py-1 rounded-full text-sm font-bold ${marginPercent > 20 ? 'bg-emerald-100 text-emerald-700' : marginPercent > 0 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
                         {marginPercent.toFixed(1)}%
