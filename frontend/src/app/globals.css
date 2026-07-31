@@ -1,96 +1,79 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #10B981;
-  --color-primary-dark: #059669;
-  --color-secondary: #0f172a;
-  --color-accent: #f59e0b;
-  --color-muted: #f8fafc;
+  --color-primary: #059669;
+  --color-primary-dark: #047857;
+  --color-secondary: #0F172A;
+  --color-accent: #D97706;
+  --color-muted: #F8FAFC;
 }
 
 :root {
-  --primary: #10B981;
-  --secondary: #0f172a;
-  --accent: #f59e0b;
+  --primary: #059669;
+  --secondary: #0F172A;
+  --accent: #D97706;
 }
 
 body {
-  background-image: url('/images/bg.png');
-  background-size: cover;
-  background-position: center;
+  background: #F8FAFC;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.04) 0px, transparent 50%);
   background-attachment: fixed;
-  color: #1e293b;
+  color: #0F172A;
   min-height: 100vh;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: -1;
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif);
 }
 
 @layer components {
-  /* Base Glass Effect */
-  .glass {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-  }
-
-  .glass-dark {
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    color: white;
-  }
-
-  .btn-primary {
-    @apply bg-gradient-to-r from-emerald-500 to-emerald-700 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 font-bold border border-emerald-400/30;
-  }
-
+  /* Premium Executive Card Styling */
   .card-agro {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-    @apply p-6 rounded-2xl transition-all duration-300 hover:shadow-xl hover:bg-white/95;
+    background: #FFFFFF;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    @apply p-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:border-emerald-200/80;
   }
 
   .card-agro-premium {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-    @apply p-6 rounded-3xl transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/20 hover:bg-white/95 border-t-2 border-l-2 border-white/80;
+    background: #FFFFFF;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
+    @apply p-6 rounded-3xl transition-all duration-300 hover:shadow-xl hover:border-emerald-300/80;
+  }
+
+  .btn-primary {
+    @apply bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg hover:shadow-emerald-700/25 transition-all duration-300 font-semibold border border-emerald-600/30;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+  }
+
+  .glass-dark {
+    background: #0F172A;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 4px 0 24px 0 rgba(15, 23, 42, 0.2);
+    color: white;
   }
 }
 
 /* Custom Scrollbar for better UI */
 ::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
+  background: rgba(241, 245, 249, 1);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.6);
-  border-radius: 6px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(5, 150, 105, 0.4);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.9);
+  background: rgba(5, 150, 105, 0.8);
 }

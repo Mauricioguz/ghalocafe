@@ -30,10 +30,10 @@ import {
 } from 'recharts';
 import { getStats } from '@/lib/api';
 
-const COLORS_CAT = ['#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
-const COLORS_CLASIF = ['#10B981', '#3B82F6', '#EC4899', '#8B5CF6'];
-const COLORS_TYPE = ['#3B82F6', '#EF4444'];
-const COLORS_PROD = ['#F59E0B', '#10B981', '#8B5CF6', '#EC4899'];
+const COLORS_CAT = ['#059669', '#D97706', '#0284C7', '#6366F1', '#E11D48', '#0D9488'];
+const COLORS_CLASIF = ['#059669', '#0284C7', '#E11D48', '#6366F1'];
+const COLORS_TYPE = ['#0284C7', '#E11D48'];
+const COLORS_PROD = ['#D97706', '#059669', '#6366F1', '#E11D48'];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -48,7 +48,6 @@ export default function Dashboard() {
       setStats(data);
     } catch (error) {
       console.error("Error loading stats", error);
-      // Fallback
     } finally {
       setLoading(false);
     }
@@ -70,48 +69,49 @@ export default function Dashboard() {
 
   if (!stats && loading) return (
     <div className="flex justify-center items-center h-full min-h-[60vh]">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)]"></div>
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600"></div>
     </div>
   );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700 pb-12">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 glass p-6 rounded-3xl border border-white/40 shadow-xl shadow-emerald-900/5">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-slate-800 flex items-center gap-3">
-            <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 p-2.5 rounded-xl shadow-lg shadow-emerald-500/30">
-              <Activity className="w-8 h-8 text-white" />
-            </div>
-            <span className="bg-gradient-to-r from-emerald-700 to-emerald-500 bg-clip-text text-transparent">Business Intelligence</span>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Panel de Control Gerencial
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+            Business Intelligence
           </h1>
-          <p className="text-slate-500 mt-3 text-lg font-medium">Resumen financiero y rendimiento productivo de La Leonora.</p>
+          <p className="text-slate-500 text-sm font-medium mt-0.5">Resumen financiero y métricas operativas de La Leonora.</p>
         </div>
         
         {/* Date Filters */}
-        <div className="flex items-center gap-3 bg-white/80 p-2.5 rounded-2xl border border-emerald-100 shadow-lg shadow-emerald-500/10 backdrop-blur-xl">
-          <div className="flex items-center gap-2 px-3">
-            <CalendarDays className="w-5 h-5 text-emerald-500" />
+        <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+          <div className="flex items-center gap-2 px-2">
+            <CalendarDays className="w-4 h-4 text-slate-500" />
             <input 
               type="date" 
-              className="bg-transparent border-none text-sm font-bold text-slate-700 outline-none cursor-pointer"
+              className="bg-transparent border-none text-xs font-semibold text-slate-700 outline-none cursor-pointer"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
           </div>
-          <span className="text-emerald-200 font-bold">|</span>
-          <div className="flex items-center gap-2 px-3">
+          <span className="text-slate-300 font-bold">|</span>
+          <div className="flex items-center gap-2 px-2">
             <input 
               type="date" 
-              className="bg-transparent border-none text-sm font-bold text-slate-700 outline-none cursor-pointer"
+              className="bg-transparent border-none text-xs font-semibold text-slate-700 outline-none cursor-pointer"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
-          <button onClick={handleFilter} className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-2.5 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all">
-            <Filter className="w-4 h-4" />
+          <button onClick={handleFilter} className="bg-slate-900 text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
+            <Filter className="w-3.5 h-3.5" />
           </button>
           {(startDate || endDate) && (
-            <button onClick={handleClearFilter} className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 p-2.5 rounded-xl text-sm font-bold transition-all">
+            <button onClick={handleClearFilter} className="text-rose-600 hover:text-rose-700 px-2 text-xs font-bold transition-all">
               Limpiar
             </button>
           )}
@@ -123,23 +123,11 @@ export default function Dashboard() {
         <div className="card-agro-premium group">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Ingresos Totales</p>
-              <p className="text-3xl font-bold text-gray-800">${Math.round(stats?.total_ingresos || 0).toLocaleString()}</p>
+              <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Ingresos Totales</p>
+              <p className="text-2xl font-black text-slate-900">${Math.round(stats?.total_ingresos || 0).toLocaleString()}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-2xl text-green-700 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card-agro-premium group">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Costos Totales</p>
-              <p className="text-3xl font-bold text-gray-800">${Math.round(stats?.total_egresos || 0).toLocaleString()}</p>
-            </div>
-            <div className="bg-red-100 p-3 rounded-2xl text-red-700 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
-              <TrendingDown className="w-6 h-6" />
+            <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-emerald-700 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
+              <TrendingUp className="w-5 h-5" />
             </div>
           </div>
         </div>
@@ -147,11 +135,11 @@ export default function Dashboard() {
         <div className="card-agro-premium group">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Utilidad Neta</p>
-              <p className="text-3xl font-bold text-[var(--primary)]">${Math.round(stats?.utilidad_neta || 0).toLocaleString()}</p>
+              <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Costos Totales</p>
+              <p className="text-2xl font-black text-slate-900">${Math.round(stats?.total_egresos || 0).toLocaleString()}</p>
             </div>
-            <div className="bg-blue-100 p-3 rounded-2xl text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-              <Wallet className="w-6 h-6" />
+            <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl text-rose-700 group-hover:bg-rose-700 group-hover:text-white transition-colors duration-300">
+              <TrendingDown className="w-5 h-5" />
             </div>
           </div>
         </div>
@@ -159,11 +147,23 @@ export default function Dashboard() {
         <div className="card-agro-premium group">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Margen Neta (%)</p>
-              <p className="text-3xl font-bold text-purple-700">{stats?.margen_ganancia?.toFixed(1)}%</p>
+              <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Utilidad Neta</p>
+              <p className="text-2xl font-black text-emerald-700">${Math.round(stats?.utilidad_neta || 0).toLocaleString()}</p>
             </div>
-            <div className="bg-purple-100 p-3 rounded-2xl text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
-              <Percent className="w-6 h-6" />
+            <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-emerald-700 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
+              <Wallet className="w-5 h-5" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card-agro-premium group">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Margen Neta (%)</p>
+              <p className="text-2xl font-black text-slate-900">{stats?.margen_ganancia?.toFixed(1)}%</p>
+            </div>
+            <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-indigo-700 group-hover:bg-indigo-700 group-hover:text-white transition-colors duration-300">
+              <Percent className="w-5 h-5" />
             </div>
           </div>
         </div>
