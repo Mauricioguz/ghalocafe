@@ -23,11 +23,6 @@ export default function LotesPage() {
       setLotes(data);
     } catch (error) {
       console.error("Error loading lotes", error);
-      setLotes([
-        { id: 1, nombre: 'Lote Norte', cultivo: 'Café Castillo', estado: 'Producción', hectareas: 4.5, numero_arboles: 15000 },
-        { id: 2, nombre: 'Lote Sur', cultivo: 'Café Colombia', estado: 'Mantenimiento', hectareas: 3.2, numero_arboles: 10000 },
-        { id: 3, nombre: 'La Colina', cultivo: 'Plátano Hartón', estado: 'Descanso', hectareas: 1.5, numero_arboles: 2500 },
-      ]);
     } finally {
       setLoading(false);
     }

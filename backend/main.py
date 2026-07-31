@@ -10,8 +10,34 @@ import io
 
 import models, schemas, database
 
+from sqlalchemy import text
+
 # Create tables
 models.Base.metadata.create_all(bind=database.engine)
+
+def auto_migrate_schema():
+    try:
+        with database.engine.connect() as conn:
+            if database.engine.dialect.name == 'postgresql':
+                conn.execute(text("ALTER TABLE lotes ADD COLUMN IF NOT EXISTS numero_arboles INTEGER DEFAULT 0;"))
+                conn.execute(text("ALTER TABLE categorias_egreso ADD COLUMN IF NOT EXISTS clasificacion_contable VARCHAR DEFAULT 'Costo de Producción';"))
+                conn.execute(text("ALTER TABLE ingresos ADD COLUMN IF NOT EXISTS cultivo VARCHAR;"))
+                conn.execute(text("ALTER TABLE egresos ADD COLUMN IF NOT EXISTS cultivo VARCHAR;"))
+                conn.commit()
+            elif database.engine.dialect.name == 'sqlite':
+                result = conn.execute(text("PRAGMA table_info(lotes);")).fetchall()
+                col_names = [r[1] for r in result]
+                if "numero_arboles" not in col_names:
+                    conn.execute(text("ALTER TABLE lotes ADD COLUMN numero_arboles INTEGER DEFAULT 0;"))
+                
+                cat_result = conn.execute(text("PRAGMA table_info(categorias_egreso);")).fetchall()
+                cat_col_names = [r[1] for r in cat_result]
+                if "clasificacion_contable" not in cat_col_names:
+                    conn.execute(text("ALTER TABLE categorias_egreso ADD COLUMN clasificacion_contable VARCHAR DEFAULT 'Costo de Producción';"))
+    except Exception as e:
+        print("Auto migration note:", e)
+
+auto_migrate_schema()
 
 app = FastAPI(title="La Leonora - API de Gestión Agrícola")
 
