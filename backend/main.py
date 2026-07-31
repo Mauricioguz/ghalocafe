@@ -20,6 +20,9 @@ def auto_migrate_schema():
         with database.engine.connect() as conn:
             if database.engine.dialect.name == 'postgresql':
                 conn.execute(text("ALTER TABLE lotes ADD COLUMN IF NOT EXISTS numero_arboles INTEGER DEFAULT 0;"))
+                conn.execute(text("ALTER TABLE lotes ADD COLUMN IF NOT EXISTS cultivo_principal VARCHAR;"))
+                conn.execute(text("ALTER TABLE lotes ADD COLUMN IF NOT EXISTS cultivo_secundario VARCHAR;"))
+                conn.execute(text("ALTER TABLE lotes ADD COLUMN IF NOT EXISTS cultivo_terciario VARCHAR;"))
                 conn.execute(text("ALTER TABLE categorias_egreso ADD COLUMN IF NOT EXISTS clasificacion_contable VARCHAR DEFAULT 'Costo de Producción';"))
                 conn.execute(text("ALTER TABLE ingresos ADD COLUMN IF NOT EXISTS cultivo VARCHAR;"))
                 conn.execute(text("ALTER TABLE egresos ADD COLUMN IF NOT EXISTS cultivo VARCHAR;"))
@@ -29,6 +32,12 @@ def auto_migrate_schema():
                 col_names = [r[1] for r in result]
                 if "numero_arboles" not in col_names:
                     conn.execute(text("ALTER TABLE lotes ADD COLUMN numero_arboles INTEGER DEFAULT 0;"))
+                if "cultivo_principal" not in col_names:
+                    conn.execute(text("ALTER TABLE lotes ADD COLUMN cultivo_principal VARCHAR;"))
+                if "cultivo_secundario" not in col_names:
+                    conn.execute(text("ALTER TABLE lotes ADD COLUMN cultivo_secundario VARCHAR;"))
+                if "cultivo_terciario" not in col_names:
+                    conn.execute(text("ALTER TABLE lotes ADD COLUMN cultivo_terciario VARCHAR;"))
                 
                 cat_result = conn.execute(text("PRAGMA table_info(categorias_egreso);")).fetchall()
                 cat_col_names = [r[1] for r in cat_result]

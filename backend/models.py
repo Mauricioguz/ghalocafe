@@ -17,6 +17,9 @@ class Lote(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, index=True)
     cultivo = Column(String)
+    cultivo_principal = Column(String, nullable=True)
+    cultivo_secundario = Column(String, nullable=True)
+    cultivo_terciario = Column(String, nullable=True)
     estado = Column(String) # activo, produccion, descanso
     hectareas = Column(Float, default=0.0)
     numero_arboles = Column(Integer, default=0)

@@ -19,6 +19,9 @@ class Configuracion(ConfiguracionBase):
 class LoteBase(BaseModel):
     nombre: str
     cultivo: str
+    cultivo_principal: Optional[str] = None
+    cultivo_secundario: Optional[str] = None
+    cultivo_terciario: Optional[str] = None
     estado: str
     hectareas: float
     numero_arboles: Optional[int] = 0
