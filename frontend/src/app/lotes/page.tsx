@@ -14,6 +14,9 @@ export default function LotesPage() {
     cultivo_principal: 'Café Castillo',
     cultivo_secundario: '',
     cultivo_terciario: '',
+    arboles_principal: 0,
+    arboles_secundario: 0,
+    arboles_terciario: 0,
     estado: 'activo',
     hectareas: 0,
     numero_arboles: 0
@@ -36,7 +39,7 @@ export default function LotesPage() {
   }, []);
 
   const totalHectareas = lotes.reduce((acc, curr) => acc + (curr.hectareas || 0), 0);
-  const totalArboles = lotes.reduce((acc, curr) => acc + (curr.numero_arboles || 0), 0);
+  const totalArboles = lotes.reduce((acc, curr) => acc + (curr.numero_arboles || (curr.arboles_principal || 0) + (curr.arboles_secundario || 0) + (curr.arboles_terciario || 0)), 0);
   const densidadPromedio = totalHectareas > 0 ? Math.round(totalArboles / totalHectareas) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,9 +51,12 @@ export default function LotesPage() {
         newLote.cultivo_terciario?.trim()
       ].filter(Boolean).join(', ');
 
+      const sumArboles = (newLote.arboles_principal || 0) + (newLote.arboles_secundario || 0) + (newLote.arboles_terciario || 0);
+
       const payload = {
         ...newLote,
-        cultivo: combinedCultivo || newLote.cultivo || 'Café'
+        cultivo: combinedCultivo || newLote.cultivo || 'Café',
+        numero_arboles: sumArboles > 0 ? sumArboles : (newLote.numero_arboles || 0)
       };
 
       if (editingId) {
@@ -59,7 +65,19 @@ export default function LotesPage() {
         await createLote(payload);
       }
       setShowForm(false);
-      setNewLote({ nombre: '', cultivo: '', cultivo_principal: 'Café Castillo', cultivo_secundario: '', cultivo_terciario: '', estado: 'activo', hectareas: 0, numero_arboles: 0 });
+      setNewLote({ 
+        nombre: '', 
+        cultivo: '', 
+        cultivo_principal: 'Café Castillo', 
+        cultivo_secundario: '', 
+        cultivo_terciario: '', 
+        arboles_principal: 0,
+        arboles_secundario: 0,
+        arboles_terciario: 0,
+        estado: 'activo', 
+        hectareas: 0, 
+        numero_arboles: 0 
+      });
       setEditingId(null);
       loadLotes();
     } catch (error) {
@@ -77,6 +95,9 @@ export default function LotesPage() {
       cultivo_principal: lote.cultivo_principal || parts[0] || '',
       cultivo_secundario: lote.cultivo_secundario || parts[1] || '',
       cultivo_terciario: lote.cultivo_terciario || parts[2] || '',
+      arboles_principal: lote.arboles_principal || 0,
+      arboles_secundario: lote.arboles_secundario || 0,
+      arboles_terciario: lote.arboles_terciario || 0,
       estado: lote.estado, 
       hectareas: lote.hectareas || 0,
       numero_arboles: lote.numero_arboles || 0
@@ -107,12 +128,24 @@ export default function LotesPage() {
             Fincas y Divisiones Agrícolas
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Gestión de Lotes</h1>
-          <p className="text-slate-500 text-sm font-medium mt-0.5">Administra las hectáreas, número de árboles y cultivos principales/secundarios.</p>
+          <p className="text-slate-500 text-sm font-medium mt-0.5">Administra hectáreas, árboles por cultivo y densidad de siembra de La Leonora.</p>
         </div>
         <button 
           onClick={() => {
             setEditingId(null);
-            setNewLote({ nombre: '', cultivo: '', cultivo_principal: 'Café Castillo', cultivo_secundario: '', cultivo_terciario: '', estado: 'activo', hectareas: 0, numero_arboles: 0 });
+            setNewLote({ 
+              nombre: '', 
+              cultivo: '', 
+              cultivo_principal: 'Café Castillo', 
+              cultivo_secundario: '', 
+              cultivo_terciario: '', 
+              arboles_principal: 0,
+              arboles_secundario: 0,
+              arboles_terciario: 0,
+              estado: 'activo', 
+              hectareas: 0, 
+              numero_arboles: 0 
+            });
             setShowForm(true);
           }}
           className="btn-primary flex items-center gap-2"
@@ -145,14 +178,26 @@ export default function LotesPage() {
       {/* Modal / Overlay Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-200 border border-slate-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-3xl p-8 max-w-xl w-full shadow-2xl animate-in zoom-in-95 duration-200 border border-slate-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-extrabold text-slate-900">{editingId ? 'Actualizar Lote' : 'Crear Nuevo Lote'}</h3>
               <button 
                 onClick={() => {
                   setShowForm(false);
                   setEditingId(null);
-                  setNewLote({ nombre: '', cultivo: '', cultivo_principal: '', cultivo_secundario: '', cultivo_terciario: '', estado: 'activo', hectareas: 0, numero_arboles: 0 });
+                  setNewLote({ 
+                    nombre: '', 
+                    cultivo: '', 
+                    cultivo_principal: '', 
+                    cultivo_secundario: '', 
+                    cultivo_terciario: '', 
+                    arboles_principal: 0,
+                    arboles_secundario: 0,
+                    arboles_terciario: 0,
+                    estado: 'activo', 
+                    hectareas: 0, 
+                    numero_arboles: 0 
+                  });
                 }} 
                 className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600"
               >
@@ -173,26 +218,41 @@ export default function LotesPage() {
                 />
               </div>
 
-              {/* Cultivos estructurados */}
+              {/* Cultivos estructurados con número de árboles por cada cultivo */}
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
                 <p className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sprout className="w-4 h-4 text-emerald-600" /> Jerarquía de Cultivos del Lote
+                  <Sprout className="w-4 h-4 text-emerald-600" /> Cultivos y Conteo de Árboles
                 </p>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-700">🥇 Cultivo Principal (Requerido)</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="Ej: Café Castillo, Café Colombia, Café Bourbon..."
-                    className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white font-semibold text-emerald-900"
-                    value={newLote.cultivo_principal}
-                    onChange={e => setNewLote({...newLote, cultivo_principal: e.target.value})}
-                  />
+                {/* Principal */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-2 space-y-1">
+                    <label className="text-xs font-semibold text-slate-700">🥇 Cultivo Principal (Requerido)</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="Ej: Café Castillo"
+                      className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white font-semibold text-emerald-900"
+                      value={newLote.cultivo_principal}
+                      onChange={e => setNewLote({...newLote, cultivo_principal: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-emerald-700">Nº Árboles</label>
+                    <input 
+                      type="number" 
+                      required
+                      placeholder="Ej: 12000"
+                      className="w-full p-2.5 border border-emerald-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-emerald-50/50 font-extrabold text-emerald-800 text-right"
+                      value={Number.isNaN(newLote.arboles_principal) ? '' : newLote.arboles_principal}
+                      onChange={e => setNewLote({...newLote, arboles_principal: parseInt(e.target.value) || 0})}
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
+                {/* Secundario */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-2 space-y-1">
                     <label className="text-xs font-medium text-slate-600">🥈 Cultivo Secundario (Opcional)</label>
                     <input 
                       type="text" 
@@ -202,15 +262,38 @@ export default function LotesPage() {
                       onChange={e => setNewLote({...newLote, cultivo_secundario: e.target.value})}
                     />
                   </div>
-
                   <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-600">Nº Plantas</label>
+                    <input 
+                      type="number" 
+                      placeholder="Ej: 1500"
+                      className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white font-bold text-slate-800 text-right"
+                      value={Number.isNaN(newLote.arboles_secundario) ? '' : newLote.arboles_secundario}
+                      onChange={e => setNewLote({...newLote, arboles_secundario: parseInt(e.target.value) || 0})}
+                    />
+                  </div>
+                </div>
+
+                {/* Terciario */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-2 space-y-1">
                     <label className="text-xs font-medium text-slate-600">🥉 Cultivo Terciario (Opcional)</label>
                     <input 
                       type="text" 
-                      placeholder="Ej: Aguacate Hass, Cítricos"
+                      placeholder="Ej: Aguacate Hass"
                       className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white"
                       value={newLote.cultivo_terciario}
                       onChange={e => setNewLote({...newLote, cultivo_terciario: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-600">Nº Árboles</label>
+                    <input 
+                      type="number" 
+                      placeholder="Ej: 300"
+                      className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white font-bold text-slate-800 text-right"
+                      value={Number.isNaN(newLote.arboles_terciario) ? '' : newLote.arboles_terciario}
+                      onChange={e => setNewLote({...newLote, arboles_terciario: parseInt(e.target.value) || 0})}
                     />
                   </div>
                 </div>
@@ -231,30 +314,18 @@ export default function LotesPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-700">Número de Árboles</label>
-                  <input 
-                    type="number" 
-                    required
-                    placeholder="Ej: 4500"
-                    className="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm font-bold text-emerald-700"
-                    value={Number.isNaN(newLote.numero_arboles) ? '' : newLote.numero_arboles}
-                    onChange={e => setNewLote({...newLote, numero_arboles: parseInt(e.target.value) || 0})}
-                  />
+                  <label className="text-xs font-semibold text-slate-700">Estado del Lote</label>
+                  <select 
+                    className="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white"
+                    value={newLote.estado}
+                    onChange={e => setNewLote({...newLote, estado: e.target.value})}
+                  >
+                    <option value="activo">Activo</option>
+                    <option value="produccion">En Producción</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="descanso">Descanso</option>
+                  </select>
                 </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Estado del Lote</label>
-                <select 
-                  className="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600 text-sm bg-white"
-                  value={newLote.estado}
-                  onChange={e => setNewLote({...newLote, estado: e.target.value})}
-                >
-                  <option value="activo">Activo</option>
-                  <option value="produccion">En Producción</option>
-                  <option value="mantenimiento">Mantenimiento</option>
-                  <option value="descanso">Descanso</option>
-                </select>
               </div>
 
               <button type="submit" className="w-full py-3.5 bg-emerald-700 text-white font-bold rounded-xl mt-4 hover:bg-emerald-800 transition-all shadow-md">
@@ -270,11 +341,16 @@ export default function LotesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {lotes.map((lote) => {
-            const arbolesHa = lote.hectareas > 0 ? Math.round((lote.numero_arboles || 0) / lote.hectareas) : 0;
             const parts = (lote.cultivo || '').split(',').map((p: string) => p.trim()).filter(Boolean);
             const pri = lote.cultivo_principal || parts[0] || 'Café';
             const sec = lote.cultivo_secundario || parts[1] || null;
             const ter = lote.cultivo_terciario || parts[2] || null;
+
+            const cantPri = lote.arboles_principal || 0;
+            const cantSec = lote.arboles_secundario || 0;
+            const cantTer = lote.arboles_terciario || 0;
+            const totArbolesLote = lote.numero_arboles || (cantPri + cantSec + cantTer);
+            const arbolesHa = lote.hectareas > 0 ? Math.round(totArbolesLote / lote.hectareas) : 0;
 
             return (
               <div key={lote.id} className="card-agro group cursor-pointer relative" onClick={(e) => handleEdit(lote, e)}>
@@ -299,22 +375,22 @@ export default function LotesPage() {
 
                 <h3 className="text-xl font-extrabold text-slate-900 mb-2">{lote.nombre}</h3>
                 
-                {/* Desglose de cultivos principal, secundario, terciario */}
-                <div className="space-y-1 mb-4">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-100">
-                    <span>🥇 Principal:</span>
-                    <span className="font-extrabold">{pri}</span>
+                {/* Desglose de cultivos principal, secundario, terciario con conteo individual */}
+                <div className="space-y-1.5 mb-4">
+                  <div className="flex justify-between items-center text-xs font-semibold text-emerald-900 bg-emerald-50/90 px-3 py-1.5 rounded-xl border border-emerald-200/80">
+                    <span>🥇 {pri}</span>
+                    {cantPri > 0 && <span className="font-black text-emerald-700">{cantPri.toLocaleString()} 🌳</span>}
                   </div>
                   {sec && (
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-slate-100/80 px-2.5 py-0.5 rounded-lg">
-                      <span>🥈 Secundario:</span>
-                      <span className="font-bold">{sec}</span>
+                    <div className="flex justify-between items-center text-xs font-medium text-slate-700 bg-slate-100/90 px-3 py-1 rounded-xl">
+                      <span>🥈 {sec}</span>
+                      {cantSec > 0 && <span className="font-bold text-slate-700">{cantSec.toLocaleString()} 🍌</span>}
                     </div>
                   )}
                   {ter && (
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-lg border border-slate-200/60">
-                      <span>🥉 Terciario:</span>
-                      <span className="font-bold">{ter}</span>
+                    <div className="flex justify-between items-center text-xs font-medium text-slate-600 bg-slate-50 px-3 py-1 rounded-xl border border-slate-200/60">
+                      <span>🥉 {ter}</span>
+                      {cantTer > 0 && <span className="font-bold text-slate-600">{cantTer.toLocaleString()} 🥑</span>}
                     </div>
                   )}
                 </div>
@@ -325,8 +401,8 @@ export default function LotesPage() {
                     <p className="font-extrabold text-slate-800 text-sm">{lote.hectareas} Ha</p>
                   </div>
                   <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-100">
-                    <p className="text-[10px] text-emerald-700 font-bold uppercase">Árboles</p>
-                    <p className="font-extrabold text-emerald-800 text-sm">{(lote.numero_arboles || 0).toLocaleString()}</p>
+                    <p className="text-[10px] text-emerald-700 font-bold uppercase">Total Plantas</p>
+                    <p className="font-extrabold text-emerald-800 text-sm">{totArbolesLote.toLocaleString()}</p>
                   </div>
                   <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100">
                     <p className="text-[10px] text-indigo-700 font-bold uppercase">Densidad</p>
@@ -340,11 +416,23 @@ export default function LotesPage() {
           {/* Add Placeholder */}
           <div 
             onClick={() => {
-              setNewLote({ nombre: '', cultivo: '', cultivo_principal: 'Café Castillo', cultivo_secundario: '', cultivo_terciario: '', estado: 'activo', hectareas: 0, numero_arboles: 0 });
+              setNewLote({ 
+                nombre: '', 
+                cultivo: '', 
+                cultivo_principal: 'Café Castillo', 
+                cultivo_secundario: '', 
+                cultivo_terciario: '', 
+                arboles_principal: 0,
+                arboles_secundario: 0,
+                arboles_terciario: 0,
+                estado: 'activo', 
+                hectareas: 0, 
+                numero_arboles: 0 
+              });
               setEditingId(null);
               setShowForm(true);
             }}
-            className="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-slate-400 hover:border-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/30 transition-all cursor-pointer h-[220px]"
+            className="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-slate-400 hover:border-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/30 transition-all cursor-pointer h-[240px]"
           >
             <Plus className="w-10 h-10 mb-2" />
             <p className="font-bold text-sm">Agregar nuevo lote</p>

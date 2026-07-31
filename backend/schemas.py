@@ -22,6 +22,9 @@ class LoteBase(BaseModel):
     cultivo_principal: Optional[str] = None
     cultivo_secundario: Optional[str] = None
     cultivo_terciario: Optional[str] = None
+    arboles_principal: Optional[int] = 0
+    arboles_secundario: Optional[int] = 0
+    arboles_terciario: Optional[int] = 0
     estado: str
     hectareas: float
     numero_arboles: Optional[int] = 0

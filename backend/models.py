@@ -20,6 +20,9 @@ class Lote(Base):
     cultivo_principal = Column(String, nullable=True)
     cultivo_secundario = Column(String, nullable=True)
     cultivo_terciario = Column(String, nullable=True)
+    arboles_principal = Column(Integer, default=0)
+    arboles_secundario = Column(Integer, default=0)
+    arboles_terciario = Column(Integer, default=0)
     estado = Column(String) # activo, produccion, descanso
     hectareas = Column(Float, default=0.0)
     numero_arboles = Column(Integer, default=0)
