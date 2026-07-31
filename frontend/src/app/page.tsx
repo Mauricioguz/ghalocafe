@@ -331,9 +331,9 @@ export default function Dashboard() {
       {/* Lot Performance Table */}
       <div className="card-agro-premium">
         <h3 className="text-xl font-bold mb-6 text-gray-800">Desempeño Operativo por Lote</h3>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[420px] pr-2">
           <table className="w-full text-left border-collapse">
-            <thead>
+            <thead className="sticky top-0 bg-white z-10 shadow-sm">
               <tr className="border-b-2 border-gray-100">
                 <th className="pb-4 pt-2 px-4 font-semibold text-gray-500 uppercase tracking-wider text-sm">Lote</th>
                 <th className="pb-4 pt-2 px-4 font-semibold text-gray-500 uppercase tracking-wider text-sm text-right">Ingresos</th>

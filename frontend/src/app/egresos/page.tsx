@@ -442,9 +442,9 @@ export default function EgresosPage() {
             {loading ? (
               <p className="text-center py-8">Cargando egresos...</p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-auto max-h-[550px] pr-2">
                 <table className="w-full text-left">
-                  <thead className="text-gray-500 border-b border-gray-100">
+                  <thead className="text-gray-500 border-b border-gray-100 sticky top-0 bg-white z-10 shadow-sm">
                     <tr>
                       <th className="pb-4 font-medium uppercase text-xs tracking-wider">Fecha</th>
                       <th className="pb-4 font-medium uppercase text-xs tracking-wider">Lote / Producto</th>
