@@ -31,6 +31,7 @@ import {
 import { getStats } from '@/lib/api';
 
 const COLORS_CAT = ['#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
+const COLORS_CLASIF = ['#10B981', '#3B82F6', '#EC4899', '#8B5CF6'];
 const COLORS_TYPE = ['#3B82F6', '#EF4444'];
 const COLORS_PROD = ['#F59E0B', '#10B981', '#8B5CF6', '#EC4899'];
 
@@ -243,52 +244,83 @@ export default function Dashboard() {
       </div>
 
       {/* Product & Lot Performance */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Costos por Categoria y Tipo */}
-        <div className="flex flex-col gap-8">
-          <div className="card-agro-premium flex flex-col h-[300px]">
-             <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
-              <PieChartIcon className="w-5 h-5 text-[var(--accent)]" />
-              Distribución de Costos (Categoría)
-            </h3>
-            <div className="flex-1">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={stats?.costos_por_categoria}
-                    cx="50%" cy="50%"
-                    innerRadius={60} outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value" nameKey="category"
-                  >
-                    {stats?.costos_por_categoria?.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS_CAT[index % COLORS_CAT.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+        {/* Costos por Rubro Contable (P&G) */}
+        <div className="card-agro-premium flex flex-col h-[320px]">
+          <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
+            <PieChartIcon className="w-5 h-5 text-blue-600" />
+            Estructura por Rubro Contable (P&G)
+          </h3>
+          <div className="flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={stats?.costos_por_clasificacion}
+                  cx="50%" cy="50%"
+                  innerRadius={55} outerRadius={75}
+                  paddingAngle={5}
+                  dataKey="value" nameKey="name"
+                >
+                  {stats?.costos_por_clasificacion?.map((entry: any, index: number) => (
+                    <Cell key={`cell-c-${index}`} fill={COLORS_CLASIF[index % COLORS_CLASIF.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(val: any) => [`$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`, 'Monto']}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
+                />
+                <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '11px' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Costos por Categoria */}
+        <div className="card-agro-premium flex flex-col h-[320px]">
+           <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
+            <PieChartIcon className="w-5 h-5 text-emerald-600" />
+            Distribución por Categoría Operativa
+          </h3>
+          <div className="flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={stats?.costos_por_categoria}
+                  cx="50%" cy="50%"
+                  innerRadius={55} outerRadius={75}
+                  paddingAngle={5}
+                  dataKey="value" nameKey="category"
+                >
+                  {stats?.costos_por_categoria?.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={COLORS_CAT[index % COLORS_CAT.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(val: any) => [`$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`, 'Monto']}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
+                />
+                <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '11px' }} />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Rentabilidad por Producto */}
-        <div className="card-agro-premium h-[300px] flex flex-col">
+        <div className="card-agro-premium h-[320px] flex flex-col">
           <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-800">
             <Activity className="w-5 h-5 text-amber-500" />
             Rentabilidad por Producto
           </h3>
           <div className="flex-1">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats?.rentabilidad_productos} layout="vertical" margin={{ top: 0, right: 0, left: 30, bottom: 0 }}>
+              <BarChart data={stats?.rentabilidad_productos} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontWeight: 600, fill: '#374151'}} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontWeight: 600, fill: '#374151', fontSize: 12}} />
                 <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}/>
                 <Bar dataKey="ingresos" name="Ingresos" fill="#10B981" radius={[0, 4, 4, 0]} barSize={12} />
-                <Bar dataKey="egresos" name="Egresos (Asignados)" fill="#EF4444" radius={[0, 4, 4, 0]} barSize={12} />
+                <Bar dataKey="egresos" name="Egresos" fill="#EF4444" radius={[0, 4, 4, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </div>

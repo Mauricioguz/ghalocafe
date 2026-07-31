@@ -109,5 +109,6 @@ class DashboardStats(BaseModel):
     flujo_caja_mensual: List[dict]
     costos_por_categoria: List[dict]
     costos_por_tipo: List[dict]
+    costos_por_clasificacion: Optional[List[dict]] = None
     rentabilidad_lotes: List[dict]
     rentabilidad_productos: List[dict]

@@ -337,6 +337,14 @@ def get_stats(start_date: str = None, end_date: str = None, db: Session = Depend
             "neto": p_ing - p_egr
         })
 
+    # Costs by Accounting Classification
+    costos_por_clasificacion = [
+        {"name": "Costo de Producción", "value": costos_produccion},
+        {"name": "Gasto Administrativo", "value": gastos_administrativos},
+        {"name": "Gasto de Ventas", "value": gastos_ventas},
+        {"name": "Gasto Financiero", "value": gastos_financieros}
+    ]
+
     return {
         "total_ingresos": total_ingresos,
         "total_egresos": total_egresos,
@@ -346,6 +354,7 @@ def get_stats(start_date: str = None, end_date: str = None, db: Session = Depend
         "flujo_caja_mensual": flujo_caja_mensual,
         "costos_por_categoria": costos_por_categoria,
         "costos_por_tipo": costos_por_tipo,
+        "costos_por_clasificacion": costos_por_clasificacion,
         "rentabilidad_lotes": rentabilidad_lotes,
         "rentabilidad_productos": rentabilidad_productos
     }
