@@ -29,7 +29,16 @@ export default function EgresosPage() {
 
   const [filterClasificacion, setFilterClasificacion] = useState('Todas');
 
-  const catMap = new Map(categorias.map(c => [c.nombre, c.clasificacion_contable || 'Costo de Producción']));
+  const getRubroNorm = (clasif?: string) => {
+    if (!clasif) return 'Costo de Producción';
+    const norm = clasif.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    if (norm.includes('admin')) return 'Gasto Administrativo';
+    if (norm.includes('finan')) return 'Gasto Financiero';
+    if (norm.includes('venta')) return 'Gasto de Ventas';
+    return 'Costo de Producción';
+  };
+
+  const catMap = new Map(categorias.map(c => [c.nombre, getRubroNorm(c.clasificacion_contable)]));
 
   const selectedCat = categorias.find(c => c.nombre === formData.categoria);
   const uniqueDescriptions = Array.from(new Set(egresos.map(e => e.descripcion).filter(Boolean)));
@@ -330,19 +339,31 @@ export default function EgresosPage() {
                 onChange={handleCategoriaChange}
                 required
               >
-                {['Gasto Financiero', 'Gasto Administrativo', 'Costo de Producción', 'Gasto de Ventas'].map(rubro => {
-                  const items = categorias.filter(c => (c.clasificacion_contable || 'Costo de Producción') === rubro);
-                  if (items.length === 0) return null;
-                  return (
-                    <optgroup key={rubro} label={`📌 ${rubro}`}>
-                      {items.map(c => (
-                        <option key={c.id} value={c.nombre}>
-                          {c.nombre}
-                        </option>
-                      ))}
-                    </optgroup>
-                  );
-                })}
+                {categorias.length === 0 ? (
+                  <option value="">Cargando rubros...</option>
+                ) : (
+                  ['Gasto Financiero', 'Gasto Administrativo', 'Costo de Producción', 'Gasto de Ventas'].map(rubro => {
+                    const items = categorias.filter(c => getRubroNorm(c.clasificacion_contable) === rubro);
+                    if (items.length === 0) return null;
+                    return (
+                      <optgroup key={rubro} label={`📌 ${rubro}`}>
+                        {items.map(c => (
+                          <option key={c.id} value={c.nombre}>
+                            {c.nombre}
+                          </option>
+                        ))}
+                      </optgroup>
+                    );
+                  })
+                )}
+                {/* Fallback to guarantee all categories are accessible */}
+                {categorias.length > 0 && (
+                  <optgroup label="📋 Todas las Categorías">
+                    {categorias.map(c => (
+                      <option key={`all-${c.id}`} value={c.nombre}>{c.nombre}</option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
               <p className="text-xs text-gray-500">
                 Rubro P&G: <span className="font-bold text-gray-800">{catMap.get(formData.categoria) || 'Costo de Producción'}</span>
@@ -442,15 +463,15 @@ export default function EgresosPage() {
             {loading ? (
               <p className="text-center py-8">Cargando egresos...</p>
             ) : (
-              <div className="overflow-x-auto overflow-y-auto max-h-[550px] pr-2">
+              <div className="overflow-x-auto overflow-y-scroll max-h-[380px] pr-2 border border-gray-100 rounded-xl">
                 <table className="w-full text-left">
                   <thead className="text-gray-500 border-b border-gray-100 sticky top-0 bg-white z-10 shadow-sm">
                     <tr>
-                      <th className="pb-4 font-medium uppercase text-xs tracking-wider">Fecha</th>
-                      <th className="pb-4 font-medium uppercase text-xs tracking-wider">Lote / Producto</th>
-                      <th className="pb-4 font-medium uppercase text-xs tracking-wider">Categoría / Rubro</th>
-                      <th className="pb-4 font-medium uppercase text-xs tracking-wider text-right">Valor</th>
-                      <th className="pb-4 font-medium uppercase text-xs tracking-wider text-center">Acciones</th>
+                      <th className="pb-4 pt-2 font-medium uppercase text-xs tracking-wider px-2">Fecha</th>
+                      <th className="pb-4 pt-2 font-medium uppercase text-xs tracking-wider px-2">Lote / Producto</th>
+                      <th className="pb-4 pt-2 font-medium uppercase text-xs tracking-wider px-2">Categoría / Rubro</th>
+                      <th className="pb-4 pt-2 font-medium uppercase text-xs tracking-wider text-right px-2">Valor</th>
+                      <th className="pb-4 pt-2 font-medium uppercase text-xs tracking-wider text-center px-2">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -458,15 +479,15 @@ export default function EgresosPage() {
                       const clasif = catMap.get(eg.categoria) || 'Costo de Producción';
                       return (
                         <tr key={eg.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="py-4 text-sm font-medium text-gray-600">{eg.fecha}</td>
-                          <td className="py-4">
+                          <td className="py-4 text-sm font-medium text-gray-600 px-2">{eg.fecha}</td>
+                          <td className="py-4 px-2">
                             <div className="flex flex-col">
                               <span className="font-semibold text-gray-800">{eg.lote?.nombre || 'General'}</span>
                               {eg.producto_id && <span className="text-xs text-blue-600">Prod: {productos.find(p=>p.id===eg.producto_id)?.nombre || eg.producto_id}</span>}
                               {eg.descripcion && <span className="text-xs text-gray-400 mt-0.5">{eg.descripcion}</span>}
                             </div>
                           </td>
-                          <td className="py-4">
+                          <td className="py-4 px-2">
                             <div className="flex flex-col gap-1 items-start">
                               <span className="font-semibold text-gray-800 text-sm">{eg.categoria}</span>
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -479,8 +500,8 @@ export default function EgresosPage() {
                               </span>
                             </div>
                           </td>
-                          <td className="py-4 text-right font-bold text-red-600">-${eg.valor?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
-                          <td className="py-4 flex justify-center gap-2">
+                          <td className="py-4 text-right font-bold text-red-600 px-2">-${eg.valor?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                          <td className="py-4 flex justify-center gap-2 px-2">
                             <button onClick={() => handleEdit(eg)} className="p-1.5 text-gray-400 hover:text-blue-600 bg-white rounded-md shadow-sm border border-gray-100"><Edit2 className="w-4 h-4" /></button>
                             <button onClick={() => handleDelete(eg.id)} className="p-1.5 text-gray-400 hover:text-red-600 bg-white rounded-md shadow-sm border border-gray-100"><Trash2 className="w-4 h-4" /></button>
                           </td>
@@ -504,7 +525,7 @@ export default function EgresosPage() {
             <h4 className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
                <DollarSign className="w-4 h-4 text-green-400" /> Presupuesto Ejecutado Total
             </h4>
-            <p className="text-3xl font-black text-white tracking-tight">${egresos.reduce((acc, curr) => acc + curr.valor, 0).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+            <p className="text-3xl font-black text-white tracking-tight">${Math.round(egresos.reduce((acc, curr) => acc + curr.valor, 0)).toLocaleString()}</p>
           </div>
 
           <div className="card-agro space-y-3">
@@ -515,7 +536,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-emerald-800">Costos de Producción</p>
                 <p className="text-xs text-emerald-600">Siembra, fertilizantes, mano obra</p>
               </div>
-              <p className="text-sm font-black text-emerald-900">${totalesPorClasificacion['Costo de Producción'].toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+              <p className="text-sm font-black text-emerald-900">${Math.round(totalesPorClasificacion['Costo de Producción']).toLocaleString()}</p>
             </div>
 
             <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
@@ -523,7 +544,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-blue-800">Gastos Administrativos</p>
                 <p className="text-xs text-blue-600">Arriendos, honorarios, servicios</p>
               </div>
-              <p className="text-sm font-black text-blue-900">${totalesPorClasificacion['Gasto Administrativo'].toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+              <p className="text-sm font-black text-blue-900">${Math.round(totalesPorClasificacion['Gasto Administrativo']).toLocaleString()}</p>
             </div>
 
             <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex justify-between items-center">
@@ -531,7 +552,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-purple-800">Gastos Financieros</p>
                 <p className="text-xs text-purple-600">Intereses, comisiones bancarias</p>
               </div>
-              <p className="text-sm font-black text-purple-900">${totalesPorClasificacion['Gasto Financiero'].toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+              <p className="text-sm font-black text-purple-900">${Math.round(totalesPorClasificacion['Gasto Financiero']).toLocaleString()}</p>
             </div>
 
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 flex justify-between items-center">
@@ -539,7 +560,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-amber-800">Gastos de Ventas</p>
                 <p className="text-xs text-amber-600">Fletes, transporte, empaques</p>
               </div>
-              <p className="text-sm font-black text-amber-900">${totalesPorClasificacion['Gasto de Ventas'].toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+              <p className="text-sm font-black text-amber-900">${Math.round(totalesPorClasificacion['Gasto de Ventas']).toLocaleString()}</p>
             </div>
           </div>
         </div>
