@@ -21,6 +21,7 @@ class LoteBase(BaseModel):
     cultivo: str
     estado: str
     hectareas: float
+    numero_arboles: Optional[int] = 0
 
 class LoteCreate(LoteBase):
     pass

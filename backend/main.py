@@ -326,7 +326,9 @@ def get_stats(start_date: str = None, end_date: str = None, db: Session = Depend
             "name": lote.nombre,
             "ingresos": l_ing,
             "egresos": l_egr,
-            "neto": l_ing - l_egr
+            "neto": l_ing - l_egr,
+            "hectareas": lote.hectareas or 0.0,
+            "numero_arboles": lote.numero_arboles or 0
         })
 
     # Rentability by Product

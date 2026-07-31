@@ -19,6 +19,7 @@ class Lote(Base):
     cultivo = Column(String)
     estado = Column(String) # activo, produccion, descanso
     hectareas = Column(Float, default=0.0)
+    numero_arboles = Column(Integer, default=0)
 
     ingresos = relationship("Ingreso", back_populates="lote")
     egresos = relationship("Egreso", back_populates="lote")
