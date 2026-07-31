@@ -271,14 +271,18 @@ def get_stats(start_date: str = None, end_date: str = None, db: Session = Depend
         "utilidad_neta": utilidad_neta_pyg
     }
 
-    # Flujo de Caja Mensual
+    # Flujo de Caja Mensual (Compatible con SQLite y PostgreSQL)
+    is_postgres = database.engine.dialect.name == 'postgresql'
+    date_format_ing = func.to_char(models.Ingreso.fecha, 'YYYY-MM') if is_postgres else func.strftime('%Y-%m', models.Ingreso.fecha)
+    date_format_egr = func.to_char(models.Egreso.fecha, 'YYYY-MM') if is_postgres else func.strftime('%Y-%m', models.Egreso.fecha)
+
     ingresos_mensuales = q_ingresos.with_entities(
-        func.strftime('%Y-%m', models.Ingreso.fecha).label('mes'),
+        date_format_ing.label('mes'),
         func.sum(models.Ingreso.total).label('total')
     ).group_by('mes').all()
 
     egresos_mensuales = q_egresos.with_entities(
-        func.strftime('%Y-%m', models.Egreso.fecha).label('mes'),
+        date_format_egr.label('mes'),
         func.sum(models.Egreso.valor).label('total')
     ).group_by('mes').all()
 
