@@ -49,7 +49,7 @@ def update_configuracion(config_in: schemas.ConfiguracionUpdate, db: Session = D
 # --- CATEGORIAS EGRESO ---
 @app.get("/categorias-egreso", response_model=List[schemas.CategoriaEgreso])
 def get_categorias_egreso(db: Session = Depends(database.get_db)):
-    cats = db.query(models.CategoriaEgreso).all()
+    cats = db.query(models.CategoriaEgreso).order_by(models.CategoriaEgreso.clasificacion_contable, models.CategoriaEgreso.nombre).all()
     # Default categories if none exist
     if not cats:
         defaults = [
@@ -58,11 +58,12 @@ def get_categorias_egreso(db: Session = Depends(database.get_db)):
             models.CategoriaEgreso(nombre="Insumos", tipo_defecto="Variable", clasificacion_contable="Costo de Producción"),
             models.CategoriaEgreso(nombre="Transporte", tipo_defecto="Variable", clasificacion_contable="Gasto de Ventas"),
             models.CategoriaEgreso(nombre="Administración", tipo_defecto="Fijo", clasificacion_contable="Gasto Administrativo"),
-            models.CategoriaEgreso(nombre="Intereses Bancarios", tipo_defecto="Fijo", clasificacion_contable="Gasto Financiero"),
+            models.CategoriaEgreso(nombre="Intereses Banco BBVA", tipo_defecto="Fijo", clasificacion_contable="Gasto Financiero"),
+            models.CategoriaEgreso(nombre="Intereses Banco Itaú", tipo_defecto="Fijo", clasificacion_contable="Gasto Financiero"),
         ]
         db.add_all(defaults)
         db.commit()
-        cats = db.query(models.CategoriaEgreso).all()
+        cats = db.query(models.CategoriaEgreso).order_by(models.CategoriaEgreso.clasificacion_contable, models.CategoriaEgreso.nombre).all()
     return cats
 
 @app.post("/categorias-egreso", response_model=schemas.CategoriaEgreso)

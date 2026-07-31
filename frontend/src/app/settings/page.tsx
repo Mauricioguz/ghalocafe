@@ -238,18 +238,41 @@ export default function SettingsPage() {
                   </div>
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-1">
-                      <label className="text-xs text-gray-500">Nombre de la Categoría</label>
-                      <input required type="text" value={newCategoria.nombre} onChange={e => setNewCategoria({...newCategoria, nombre: e.target.value})} className="w-full p-2 border rounded-lg text-sm outline-red-600" placeholder="Ej: Arrendamientos" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-gray-500">Clasificación P&G</label>
-                      <select required value={newCategoria.clasificacion_contable} onChange={e => setNewCategoria({...newCategoria, clasificacion_contable: e.target.value})} className="w-full p-2 border rounded-lg text-sm outline-red-600 bg-white">
+                      <label className="text-xs text-gray-500">Clasificación P&G / Rubro Contable</label>
+                      <select required value={newCategoria.clasificacion_contable} onChange={e => setNewCategoria({...newCategoria, clasificacion_contable: e.target.value})} className="w-full p-2 border rounded-lg text-sm outline-red-600 bg-white font-medium">
                         <option value="Costo de Producción">Costo de Producción</option>
                         <option value="Gasto Administrativo">Gasto Administrativo</option>
                         <option value="Gasto de Ventas">Gasto de Ventas</option>
                         <option value="Gasto Financiero">Gasto Financiero</option>
                       </select>
                     </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs text-gray-500">Nombre del Rubro / Categoría Detallada</label>
+                      <input required type="text" value={newCategoria.nombre} onChange={e => setNewCategoria({...newCategoria, nombre: e.target.value})} className="w-full p-2 border rounded-lg text-sm outline-red-600 font-semibold" placeholder="Ej: Intereses Banco BBVA, Arriendo Oficina..." />
+                      
+                      {/* Sugerencias dinámicas según rubro */}
+                      <div className="pt-2">
+                        <p className="text-[11px] text-gray-500 font-medium mb-1.5">💡 Sugerencias comunes para {newCategoria.clasificacion_contable}:</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(newCategoria.clasificacion_contable === 'Gasto Financiero' ? ['Intereses Banco BBVA', 'Intereses Banco Itaú', 'Intereses Bancolombia', 'Comisiones Bancarias', 'Cuota de Manejo'] :
+                            newCategoria.clasificacion_contable === 'Gasto Administrativo' ? ['Sueldo Administrador', 'Arriendo Oficina', 'Honorarios Contador', 'Servicios Públicos', 'Papelería y Utensilios'] :
+                            newCategoria.clasificacion_contable === 'Gasto de Ventas' ? ['Fletes y Transporte', 'Empaques y Bultos', 'Comisiones de Venta'] :
+                            ['Mano de Obra Cosecha', 'Fertilizantes NPK', 'Fungicidas e Insumos', 'Mantenimiento Maquinaria']
+                          ).map((sug) => (
+                            <button
+                              key={sug}
+                              type="button"
+                              onClick={() => setNewCategoria({ ...newCategoria, nombre: sug })}
+                              className="text-[11px] bg-white hover:bg-red-50 text-gray-700 hover:text-red-700 border border-gray-200 hover:border-red-200 px-2 py-0.5 rounded-full transition-all"
+                            >
+                              + {sug}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-1">
                       <label className="text-xs text-gray-500">Tipo por Defecto</label>
                       <select required value={newCategoria.tipo_defecto} onChange={e => setNewCategoria({...newCategoria, tipo_defecto: e.target.value})} className="w-full p-2 border rounded-lg text-sm outline-red-600 bg-white">

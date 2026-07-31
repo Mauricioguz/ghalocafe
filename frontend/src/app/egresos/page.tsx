@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TrendingDown, Plus, Calendar, Tag, Info, DollarSign, MapPin, Sprout, Edit2, Trash2, X, Package } from 'lucide-react';
-import { getEgresos, createEgreso, updateEgreso, deleteEgreso, getLotes, getCategoriasEgreso, getProductos } from '@/lib/api';
+import { getEgresos, createEgreso, updateEgreso, deleteEgreso, getLotes, getCategoriasEgreso, getProductos, createCategoriaEgreso } from '@/lib/api';
 
 export default function EgresosPage() {
   const [egresos, setEgresos] = useState<any[]>([]);
@@ -12,6 +12,9 @@ export default function EgresosPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   
+  const [showQuickCatModal, setShowQuickCatModal] = useState(false);
+  const [quickCat, setQuickCat] = useState({ nombre: '', clasificacion_contable: 'Gasto Financiero', tipo_defecto: 'Fijo' });
+
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
     lote_id: '',
@@ -29,6 +32,7 @@ export default function EgresosPage() {
   const catMap = new Map(categorias.map(c => [c.nombre, c.clasificacion_contable || 'Costo de Producción']));
 
   const selectedCat = categorias.find(c => c.nombre === formData.categoria);
+  const uniqueDescriptions = Array.from(new Set(egresos.map(e => e.descripcion).filter(Boolean)));
 
   const filteredEgresos = egresos.filter(eg => {
     if (filterClasificacion === 'Todas') return true;
@@ -121,6 +125,20 @@ export default function EgresosPage() {
     }
   };
 
+  const handleQuickCatSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickCat.nombre.trim()) return;
+    try {
+      await createCategoriaEgreso(quickCat);
+      await fetchData();
+      setFormData(prev => ({ ...prev, categoria: quickCat.nombre, tipo: quickCat.tipo_defecto }));
+      setQuickCat({ nombre: '', clasificacion_contable: 'Gasto Financiero', tipo_defecto: 'Fijo' });
+      setShowQuickCatModal(false);
+    } catch (err) {
+      alert('Error creando rubro.');
+    }
+  };
+
   const handleEdit = (eg: any) => {
     setEditingId(eg.id);
     setFormData({
@@ -172,6 +190,80 @@ export default function EgresosPage() {
         </button>
       </header>
 
+      {/* Modal Rápido de Creación de Rubro / Categoría */}
+      {showQuickCatModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Crear Nuevo Rubro / Categoría</h3>
+              <button onClick={() => setShowQuickCatModal(false)} className="p-1 text-gray-400 hover:text-gray-600 rounded-full"><X className="w-5 h-5"/></button>
+            </div>
+            <form onSubmit={handleQuickCatSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs text-gray-500 font-medium">Clasificación P&G / Rubro Contable</label>
+                <select 
+                  required 
+                  value={quickCat.clasificacion_contable} 
+                  onChange={e => setQuickCat({...quickCat, clasificacion_contable: e.target.value})} 
+                  className="w-full p-3 border border-gray-200 rounded-xl text-sm outline-red-600 bg-white font-medium"
+                >
+                  <option value="Gasto Financiero">Gasto Financiero (ej: Intereses Banco BBVA, Itaú)</option>
+                  <option value="Gasto Administrativo">Gasto Administrativo (ej: Honorarios, Arriendos)</option>
+                  <option value="Costo de Producción">Costo de Producción (ej: Siembra, Mano obra)</option>
+                  <option value="Gasto de Ventas">Gasto de Ventas (ej: Fletes, Empaques)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-gray-500 font-medium">Nombre Detallado del Rubro</label>
+                <input 
+                  required 
+                  type="text" 
+                  value={quickCat.nombre} 
+                  onChange={e => setQuickCat({...quickCat, nombre: e.target.value})} 
+                  className="w-full p-3 border border-gray-200 rounded-xl text-sm outline-red-600 font-semibold" 
+                  placeholder="Ej: Intereses Banco Itaú - Crédito 409" 
+                />
+                <div className="pt-2">
+                  <p className="text-[11px] text-gray-500 font-medium mb-1">💡 Sugerencias rápidas:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {(quickCat.clasificacion_contable === 'Gasto Financiero' ? ['Intereses Banco BBVA', 'Intereses Banco Itaú', 'Comisiones Bancarias', 'Cuota de Manejo'] :
+                      quickCat.clasificacion_contable === 'Gasto Administrativo' ? ['Sueldo Administrador', 'Arriendo Oficina', 'Honorarios Contador', 'Servicios Públicos'] :
+                      ['Mano de Obra Cosecha', 'Fertilizantes NPK', 'Insumos Varios']
+                    ).map(sug => (
+                      <button 
+                        key={sug} 
+                        type="button" 
+                        onClick={() => setQuickCat({ ...quickCat, nombre: sug })}
+                        className="text-[11px] bg-gray-100 hover:bg-red-50 hover:text-red-700 text-gray-700 px-2 py-0.5 rounded-full border border-gray-200"
+                      >
+                        + {sug}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-gray-500 font-medium">Tipo de Costo por Defecto</label>
+                <select 
+                  value={quickCat.tipo_defecto} 
+                  onChange={e => setQuickCat({...quickCat, tipo_defecto: e.target.value})} 
+                  className="w-full p-3 border border-gray-200 rounded-xl text-sm outline-red-600 bg-white"
+                >
+                  <option value="Fijo">Fijo</option>
+                  <option value="Variable">Variable</option>
+                </select>
+              </div>
+
+              <button type="submit" className="w-full py-3 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition-all shadow-md">
+                Guardar Rubro e Insertar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {showForm && (
         <div className="card-agro border-t-4 border-t-red-700 animate-in slide-in-from-top-4 duration-300 relative shadow-xl">
           <button onClick={() => { setShowForm(false); setEditingId(null); }} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-100"><X className="w-5 h-5"/></button>
@@ -219,23 +311,41 @@ export default function EgresosPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                <Tag className="w-4 h-4 text-gray-400" /> Categoría (Rubro Contable)
-              </label>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <Tag className="w-4 h-4 text-gray-400" /> Categoría / Rubro
+                </label>
+                <button 
+                  type="button" 
+                  onClick={() => setShowQuickCatModal(true)} 
+                  className="text-xs font-bold text-red-600 hover:text-red-700 hover:underline flex items-center gap-0.5"
+                >
+                  + Nuevo Rubro
+                </button>
+              </div>
+              
               <select 
-                className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-medium"
                 value={formData.categoria}
                 onChange={handleCategoriaChange}
                 required
               >
-                {categorias.map(c => (
-                  <option key={c.id} value={c.nombre}>
-                    {c.nombre} ({c.clasificacion_contable || 'Costo de Producción'})
-                  </option>
-                ))}
+                {['Gasto Financiero', 'Gasto Administrativo', 'Costo de Producción', 'Gasto de Ventas'].map(rubro => {
+                  const items = categorias.filter(c => (c.clasificacion_contable || 'Costo de Producción') === rubro);
+                  if (items.length === 0) return null;
+                  return (
+                    <optgroup key={rubro} label={`📌 ${rubro}`}>
+                      {items.map(c => (
+                        <option key={c.id} value={c.nombre}>
+                          {c.nombre}
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
               </select>
               <p className="text-xs text-gray-500">
-                Rubro: <span className="font-semibold text-gray-700">{catMap.get(formData.categoria) || 'Costo de Producción'}</span>
+                Rubro P&G: <span className="font-bold text-gray-800">{catMap.get(formData.categoria) || 'Costo de Producción'}</span>
               </p>
             </div>
 
@@ -278,16 +388,23 @@ export default function EgresosPage() {
 
             <div className="space-y-2 lg:col-span-3">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                <Info className="w-4 h-4 text-gray-400" /> Descripción / Notas
+                <Info className="w-4 h-4 text-gray-400" /> Descripción / Notas (Memoria)
               </label>
               <input 
                 type="text" 
                 required
-                placeholder="Ej: Pago de semana a 3 recolectores o intereses de crédito bancario" 
+                list="descripciones-memoria"
+                placeholder="Ej: Intereses crédito rotativo Banco BBVA o Banco Itaú..." 
                 className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all" 
                 value={formData.descripcion}
                 onChange={e => setFormData({...formData, descripcion: e.target.value})}
               />
+              <datalist id="descripciones-memoria">
+                {uniqueDescriptions.map((desc: any, idx: number) => (
+                  <option key={idx} value={desc} />
+                ))}
+              </datalist>
+              <p className="text-xs text-gray-400">💡 Escribe o selecciona una descripción usada anteriormente en la memoria del sistema.</p>
             </div>
 
             <div className="lg:col-span-3 pt-2">
