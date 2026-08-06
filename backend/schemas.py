@@ -51,8 +51,8 @@ class Producto(ProductoBase):
 
 class IngresoBase(BaseModel):
     fecha: date
-    lote_id: int
-    producto_id: int
+    lote_id: Optional[int] = None
+    producto_id: Optional[int] = None
     cantidad: float
     precio_unitario: float
     total: float
@@ -63,6 +63,8 @@ class IngresoCreate(IngresoBase):
 
 class Ingreso(IngresoBase):
     id: int
+    lote: Optional[Lote] = None
+    producto: Optional[Producto] = None
     class Config:
         from_attributes = True
 
@@ -94,6 +96,8 @@ class EgresoCreate(EgresoBase):
 
 class Egreso(EgresoBase):
     id: int
+    lote: Optional[Lote] = None
+    producto: Optional[Producto] = None
     class Config:
         from_attributes = True
 

@@ -165,10 +165,21 @@ def delete_lote(lote_id: int, db: Session = Depends(database.get_db)):
     db.commit()
     return {"ok": True}
 
-# --- PRODUCTOS ---
 @app.get("/productos", response_model=List[schemas.Producto])
 def get_productos(db: Session = Depends(database.get_db)):
-    return db.query(models.Producto).all()
+    prods = db.query(models.Producto).order_by(models.Producto.nombre).all()
+    if not prods:
+        defaults = [
+            models.Producto(nombre="Café Pergamino", unidad="Kg"),
+            models.Producto(nombre="Café Pasilla", unidad="Kg"),
+            models.Producto(nombre="Café Cereza", unidad="Kg"),
+            models.Producto(nombre="Plátano Hartón", unidad="Kilo"),
+            models.Producto(nombre="Aguacate Hass", unidad="Kilo")
+        ]
+        db.add_all(defaults)
+        db.commit()
+        prods = db.query(models.Producto).order_by(models.Producto.nombre).all()
+    return prods
 
 @app.post("/productos", response_model=schemas.Producto)
 def create_producto(producto: schemas.ProductoCreate, db: Session = Depends(database.get_db)):

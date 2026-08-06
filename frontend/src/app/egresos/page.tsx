@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TrendingDown, Plus, Calendar, Tag, Info, DollarSign, MapPin, Sprout, Edit2, Trash2, X, Package } from 'lucide-react';
-import { getEgresos, createEgreso, updateEgreso, deleteEgreso, getLotes, getCategoriasEgreso, getProductos, createCategoriaEgreso } from '@/lib/api';
+import { getEgresos, createEgreso, updateEgreso, deleteEgreso, getLotes, getCategoriasEgreso, getProductos, createCategoriaEgreso, createProducto, createLote } from '@/lib/api';
 
 export default function EgresosPage() {
   const [egresos, setEgresos] = useState<any[]>([]);
@@ -14,6 +14,12 @@ export default function EgresosPage() {
   
   const [showQuickCatModal, setShowQuickCatModal] = useState(false);
   const [quickCat, setQuickCat] = useState({ nombre: '', clasificacion_contable: 'Gasto Financiero', tipo_defecto: 'Fijo' });
+
+  const [showQuickProdModal, setShowQuickProdModal] = useState(false);
+  const [quickProd, setQuickProd] = useState({ nombre: '', unidad: 'Kg' });
+
+  const [showQuickLoteModal, setShowQuickLoteModal] = useState(false);
+  const [quickLote, setQuickLote] = useState({ nombre: '', cultivo_principal: 'Café Castillo', hectareas: 1.0, estado: 'activo' });
 
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
@@ -40,8 +46,12 @@ export default function EgresosPage() {
 
   const catMap = new Map(categorias.map(c => [c.nombre, getRubroNorm(c.clasificacion_contable)]));
 
-  const selectedCat = categorias.find(c => c.nombre === formData.categoria);
   const uniqueDescriptions = Array.from(new Set(egresos.map(e => e.descripcion).filter(Boolean)));
+
+  const selectedLote = lotes.find(l => l.id.toString() === formData.lote_id?.toString());
+  const cultivosDelLote = selectedLote && selectedLote.cultivo 
+    ? selectedLote.cultivo.split(',').map((c: string) => c.trim()).filter((c: string) => c) 
+    : [];
 
   const filteredEgresos = egresos.filter(eg => {
     if (filterClasificacion === 'Todas') return true;
@@ -59,11 +69,6 @@ export default function EgresosPage() {
     'Gasto de Ventas': 0,
     'Gasto Financiero': 0
   });
-
-  const selectedLote = lotes.find(l => l.id.toString() === formData.lote_id?.toString());
-  const cultivosDelLote = selectedLote && selectedLote.cultivo 
-    ? selectedLote.cultivo.split(',').map((c: string) => c.trim()).filter((c: string) => c) 
-    : [];
 
   const fetchData = async () => {
     try {
@@ -148,29 +153,59 @@ export default function EgresosPage() {
     }
   };
 
+  const handleQuickProdSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickProd.nombre.trim()) return;
+    try {
+      const created = await createProducto(quickProd);
+      await fetchData();
+      setFormData(prev => ({ ...prev, producto_id: created.id.toString() }));
+      setQuickProd({ nombre: '', unidad: 'Kg' });
+      setShowQuickProdModal(false);
+    } catch (err) {
+      alert('Error creando producto.');
+    }
+  };
+
+  const handleQuickLoteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickLote.nombre.trim()) return;
+    try {
+      const created = await createLote({
+        ...quickLote,
+        cultivo: quickLote.cultivo_principal
+      });
+      await fetchData();
+      setFormData(prev => ({ ...prev, lote_id: created.id.toString() }));
+      setQuickLote({ nombre: '', cultivo_principal: 'Café Castillo', hectareas: 1.0, estado: 'activo' });
+      setShowQuickLoteModal(false);
+    } catch (err) {
+      alert('Error creando lote.');
+    }
+  };
+
   const handleEdit = (eg: any) => {
-    setEditingId(eg.id);
     setFormData({
       fecha: eg.fecha,
-      lote_id: eg.lote_id ? eg.lote_id.toString() : '',
-      producto_id: eg.producto_id ? eg.producto_id.toString() : '',
+      lote_id: eg.lote_id?.toString() || '',
+      producto_id: eg.producto_id?.toString() || '',
       categoria: eg.categoria,
-      descripcion: eg.descripcion,
+      descripcion: eg.descripcion || '',
       valor: eg.valor,
       tipo: eg.tipo || 'Variable',
       cultivo: eg.cultivo || ''
     });
+    setEditingId(eg.id);
     setShowForm(true);
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este registro de egreso?")) {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este egreso?")) {
       try {
         await deleteEgreso(id);
         fetchData();
       } catch (error) {
-        console.error("Error deleting egreso", error);
-        alert("Error al eliminar.");
+        alert("No se pudo eliminar");
       }
     }
   };
@@ -477,13 +512,17 @@ export default function EgresosPage() {
                   <tbody className="divide-y divide-gray-50">
                     {filteredEgresos.map((eg) => {
                       const clasif = catMap.get(eg.categoria) || 'Costo de Producción';
+                      const loteNombre = eg.lote?.nombre || lotes.find(l => l.id.toString() === eg.lote_id?.toString())?.nombre || 'General / Finca';
+                      const prodNombre = eg.producto?.nombre || productos.find(p => p.id.toString() === eg.producto_id?.toString())?.nombre;
+
                       return (
                         <tr key={eg.id} className="hover:bg-gray-50 transition-colors">
                           <td className="py-4 text-sm font-medium text-gray-600 px-2">{eg.fecha}</td>
                           <td className="py-4 px-2">
                             <div className="flex flex-col">
-                              <span className="font-semibold text-gray-800">{eg.lote?.nombre || 'General'}</span>
-                              {eg.producto_id && <span className="text-xs text-blue-600">Prod: {productos.find(p=>p.id===eg.producto_id)?.nombre || eg.producto_id}</span>}
+                              <span className="font-semibold text-gray-800">{loteNombre}</span>
+                              {prodNombre && <span className="text-xs font-semibold text-emerald-800">Prod: {prodNombre}</span>}
+                              {eg.cultivo && <span className="text-[11px] text-slate-500 font-medium">🌱 {eg.cultivo}</span>}
                               {eg.descripcion && <span className="text-xs text-gray-400 mt-0.5">{eg.descripcion}</span>}
                             </div>
                           </td>
@@ -500,7 +539,7 @@ export default function EgresosPage() {
                               </span>
                             </div>
                           </td>
-                          <td className="py-4 text-right font-bold text-red-600 px-2">-${eg.valor?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                          <td className="py-4 text-right font-black text-rose-600 px-2 text-base">-${Math.round(eg.valor || 0).toLocaleString()}</td>
                           <td className="py-4 flex justify-center gap-2 px-2">
                             <button onClick={() => handleEdit(eg)} className="p-1.5 text-gray-400 hover:text-blue-600 bg-white rounded-md shadow-sm border border-gray-100"><Edit2 className="w-4 h-4" /></button>
                             <button onClick={() => handleDelete(eg.id)} className="p-1.5 text-gray-400 hover:text-red-600 bg-white rounded-md shadow-sm border border-gray-100"><Trash2 className="w-4 h-4" /></button>
