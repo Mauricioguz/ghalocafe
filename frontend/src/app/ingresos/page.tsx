@@ -60,17 +60,18 @@ export default function IngresosPage() {
   }, []);
 
   const handleCantidadChange = (val: number) => {
-    const newTotal = val * (formData.precio_unitario || 0);
+    const newTotal = Math.round((val * (formData.precio_unitario || 0)) * 100) / 100;
     setFormData(prev => ({ ...prev, cantidad: val, total: newTotal }));
   };
 
   const handlePrecioUnitarioChange = (val: number) => {
-    const newTotal = (formData.cantidad || 0) * val;
+    const newTotal = Math.round(((formData.cantidad || 0) * val) * 100) / 100;
     setFormData(prev => ({ ...prev, precio_unitario: val, total: newTotal }));
   };
 
   const handleTotalChange = (val: number) => {
-    const calcUnit = formData.cantidad > 0 ? val / formData.cantidad : 0;
+    const rawUnit = formData.cantidad > 0 ? val / formData.cantidad : 0;
+    const calcUnit = Math.round(rawUnit * 100) / 100;
     setFormData(prev => ({ ...prev, total: val, precio_unitario: calcUnit }));
   };
 
