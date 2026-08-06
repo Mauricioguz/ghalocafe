@@ -4,6 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { TrendingUp, Plus, Calendar, Package, DollarSign, MapPin, Sprout, Edit2, Trash2, X } from 'lucide-react';
 import { getIngresos, createIngreso, updateIngreso, deleteIngreso, getLotes, getProductos, createProducto, createLote } from '@/lib/api';
 
+const formatCOP = (val: number | null | undefined) => {
+  if (val === undefined || val === null || isNaN(val)) return '$ 0,00';
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(val);
+};
+
 export default function IngresosPage() {
   const [ingresos, setIngresos] = useState<any[]>([]);
   const [lotes, setLotes] = useState<any[]>([]);
@@ -85,7 +95,7 @@ export default function IngresosPage() {
         producto_id: formData.producto_id ? parseInt(formData.producto_id as string) : null,
         cantidad: formData.cantidad || 0,
         precio_unitario: formData.precio_unitario || 0,
-        total: calcTotal || 0,
+        total: Math.round((calcTotal || 0) * 100) / 100,
         cultivo: formData.cultivo || ''
       };
 
@@ -200,7 +210,7 @@ export default function IngresosPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-agro">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Ingresos Registrados</p>
-          <p className="text-2xl font-black text-emerald-700">${Math.round(totalIngresosGral).toLocaleString()}</p>
+          <p className="text-2xl font-black text-emerald-700">{formatCOP(totalIngresosGral)}</p>
         </div>
         <div className="card-agro">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Número de Ventas / Cosechas</p>
@@ -208,7 +218,7 @@ export default function IngresosPage() {
         </div>
         <div className="card-agro">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Promedio por Transacción</p>
-          <p className="text-2xl font-black text-indigo-700">${ingresos.length > 0 ? Math.round(totalIngresosGral / ingresos.length).toLocaleString() : 0}</p>
+          <p className="text-2xl font-black text-indigo-700">{formatCOP(ingresos.length > 0 ? totalIngresosGral / ingresos.length : 0)}</p>
         </div>
       </div>
 
@@ -484,13 +494,13 @@ export default function IngresosPage() {
                         {prodNombre}
                       </td>
                       <td className="py-4 px-3 text-sm text-right font-bold text-slate-700">
-                        {ing.cantidad} <span className="text-xs font-normal text-slate-500">{prodUnidad}</span>
+                        {Number(ing.cantidad || 0).toFixed(2)} <span className="text-xs font-normal text-slate-500">{prodUnidad}</span>
                       </td>
                       <td className="py-4 px-3 text-sm text-right text-slate-600 font-semibold">
-                        ${Math.round(ing.precio_unitario || 0).toLocaleString()}
+                        {formatCOP(ing.precio_unitario || 0)}
                       </td>
                       <td className="py-4 px-3 text-right font-black text-emerald-700 text-base">
-                        ${Math.round(ing.total || 0).toLocaleString()}
+                        {formatCOP(ing.total || 0)}
                       </td>
                       <td className="py-4 px-3">
                         <div className="flex justify-center items-center gap-1.5">

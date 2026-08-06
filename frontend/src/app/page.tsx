@@ -35,6 +35,16 @@ const COLORS_CLASIF = ['#059669', '#0284C7', '#E11D48', '#6366F1'];
 const COLORS_TYPE = ['#0284C7', '#E11D48'];
 const COLORS_PROD = ['#D97706', '#059669', '#6366F1', '#E11D48'];
 
+const formatCOP = (val: number | null | undefined) => {
+  if (val === undefined || val === null || isNaN(val)) return '$ 0,00';
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(val);
+};
+
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -124,7 +134,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Ingresos Totales</p>
-              <p className="text-2xl font-black text-slate-900">${Math.round(stats?.total_ingresos || 0).toLocaleString()}</p>
+              <p className="text-2xl font-black text-slate-900">{formatCOP(stats?.total_ingresos || 0)}</p>
             </div>
             <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-emerald-700 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
               <TrendingUp className="w-5 h-5" />
@@ -136,7 +146,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Costos Totales</p>
-              <p className="text-2xl font-black text-slate-900">${Math.round(stats?.total_egresos || 0).toLocaleString()}</p>
+              <p className="text-2xl font-black text-slate-900">{formatCOP(stats?.total_egresos || 0)}</p>
             </div>
             <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl text-rose-700 group-hover:bg-rose-700 group-hover:text-white transition-colors duration-300">
               <TrendingDown className="w-5 h-5" />
@@ -148,7 +158,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Utilidad Neta</p>
-              <p className="text-2xl font-black text-emerald-700">${Math.round(stats?.utilidad_neta || 0).toLocaleString()}</p>
+              <p className="text-2xl font-black text-emerald-700">{formatCOP(stats?.utilidad_neta || 0)}</p>
             </div>
             <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-emerald-700 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
               <Wallet className="w-5 h-5" />
@@ -160,7 +170,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Margen Neta (%)</p>
-              <p className="text-2xl font-black text-slate-900">{stats?.margen_ganancia?.toFixed(1)}%</p>
+              <p className="text-2xl font-black text-slate-900">{stats?.margen_ganancia?.toFixed(2)}%</p>
             </div>
             <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-indigo-700 group-hover:bg-indigo-700 group-hover:text-white transition-colors duration-300">
               <Percent className="w-5 h-5" />
@@ -181,38 +191,38 @@ export default function Dashboard() {
             <div className="space-y-3">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-800 font-bold">Ingresos Operacionales</span>
-                <span className="font-bold text-emerald-600">${Math.round(stats?.pyg_consolidado?.ingresos_operacionales || 0).toLocaleString()}</span>
+                <span className="font-bold text-emerald-600">{formatCOP(stats?.pyg_consolidado?.ingresos_operacionales || 0)}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100 pl-4">
                 <span className="text-gray-500">(-) Costos de Producción</span>
-                <span className="font-semibold text-rose-500">${Math.round(stats?.pyg_consolidado?.costos_produccion || 0).toLocaleString()}</span>
+                <span className="font-semibold text-rose-500">{formatCOP(stats?.pyg_consolidado?.costos_produccion || 0)}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b-2 border-gray-200 bg-gray-50/50 rounded-lg px-2">
                 <span className="text-gray-800 font-bold">(=) Utilidad Bruta</span>
-                <span className="font-bold text-blue-600">${Math.round(stats?.pyg_consolidado?.utilidad_bruta || 0).toLocaleString()}</span>
+                <span className="font-bold text-blue-600">{formatCOP(stats?.pyg_consolidado?.utilidad_bruta || 0)}</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-gray-100 pl-4">
                 <span className="text-gray-500 text-sm">(-) Gastos Administrativos</span>
-                <span className="font-semibold text-rose-500 text-sm">${Math.round(stats?.pyg_consolidado?.gastos_administrativos || 0).toLocaleString()}</span>
+                <span className="font-semibold text-rose-500 text-sm">{formatCOP(stats?.pyg_consolidado?.gastos_administrativos || 0)}</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-gray-100 pl-4">
                 <span className="text-gray-500 text-sm">(-) Gastos de Ventas</span>
-                <span className="font-semibold text-rose-500 text-sm">${Math.round(stats?.pyg_consolidado?.gastos_ventas || 0).toLocaleString()}</span>
+                <span className="font-semibold text-rose-500 text-sm">{formatCOP(stats?.pyg_consolidado?.gastos_ventas || 0)}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b-2 border-gray-200 bg-gray-50/50 rounded-lg px-2">
                 <span className="text-gray-800 font-bold">(=) Utilidad Operacional</span>
-                <span className="font-bold text-blue-600">${Math.round(stats?.pyg_consolidado?.utilidad_operacional || 0).toLocaleString()}</span>
+                <span className="font-bold text-blue-600">{formatCOP(stats?.pyg_consolidado?.utilidad_operacional || 0)}</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-gray-100 pl-4">
                 <span className="text-gray-500 text-sm">(-) Gastos Financieros</span>
-                <span className="font-semibold text-rose-500 text-sm">${Math.round(stats?.pyg_consolidado?.gastos_financieros || 0).toLocaleString()}</span>
+                <span className="font-semibold text-rose-500 text-sm">{formatCOP(stats?.pyg_consolidado?.gastos_financieros || 0)}</span>
               </div>
             </div>
           </div>
           
           <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl border border-green-100 flex justify-between items-center">
             <span className="text-lg font-black text-green-900 uppercase tracking-wider">Utilidad Neta</span>
-            <span className="text-2xl font-black text-green-700">${Math.round(stats?.pyg_consolidado?.utilidad_neta || 0).toLocaleString()}</span>
+            <span className="text-2xl font-black text-green-700">{formatCOP(stats?.pyg_consolidado?.utilidad_neta || 0)}</span>
           </div>
         </div>
 
@@ -350,13 +360,13 @@ export default function Dashboard() {
                 return (
                   <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors group">
                     <td className="py-4 px-3 font-bold text-slate-800">{lote.name}</td>
-                    <td className="py-4 px-3 text-center text-xs font-semibold text-slate-600">{lote.hectareas ? `${lote.hectareas} Ha` : 'N/A'}</td>
+                    <td className="py-4 px-3 text-center text-xs font-semibold text-slate-600">{lote.hectareas ? `${lote.hectareas.toFixed(2)} Ha` : 'N/A'}</td>
                     <td className="py-4 px-3 text-center text-xs font-bold text-emerald-700 bg-emerald-50/50 rounded-lg">{lote.numero_arboles ? `${lote.numero_arboles.toLocaleString()} 🌳` : '0'}</td>
-                    <td className="py-4 px-3 text-emerald-600 font-semibold text-right">${Math.round(lote.ingresos || 0).toLocaleString()}</td>
-                    <td className="py-4 px-3 text-rose-600 font-semibold text-right">${Math.round(lote.egresos || 0).toLocaleString()}</td>
+                    <td className="py-4 px-3 text-emerald-600 font-semibold text-right">{formatCOP(lote.ingresos || 0)}</td>
+                    <td className="py-4 px-3 text-rose-600 font-semibold text-right">{formatCOP(lote.egresos || 0)}</td>
                     <td className="py-4 px-3 text-center">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${marginPercent > 20 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : marginPercent > 0 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
-                        {marginPercent.toFixed(1)}%
+                        {marginPercent.toFixed(2)}%
                       </span>
                     </td>
                     <td className="py-4 px-3 w-1/4">

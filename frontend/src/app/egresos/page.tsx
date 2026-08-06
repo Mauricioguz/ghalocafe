@@ -4,6 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { TrendingDown, Plus, Calendar, Tag, Info, DollarSign, MapPin, Sprout, Edit2, Trash2, X, Package } from 'lucide-react';
 import { getEgresos, createEgreso, updateEgreso, deleteEgreso, getLotes, getCategoriasEgreso, getProductos, createCategoriaEgreso, createProducto, createLote } from '@/lib/api';
 
+const formatCOP = (val: number | null | undefined) => {
+  if (val === undefined || val === null || isNaN(val)) return '$ 0,00';
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(val);
+};
+
 export default function EgresosPage() {
   const [egresos, setEgresos] = useState<any[]>([]);
   const [lotes, setLotes] = useState<any[]>([]);
@@ -539,7 +549,7 @@ export default function EgresosPage() {
                               </span>
                             </div>
                           </td>
-                          <td className="py-4 text-right font-black text-rose-600 px-2 text-base">-${Math.round(eg.valor || 0).toLocaleString()}</td>
+                          <td className="py-4 text-right font-black text-rose-600 px-2 text-base">-{formatCOP(eg.valor || 0)}</td>
                           <td className="py-4 flex justify-center gap-2 px-2">
                             <button onClick={() => handleEdit(eg)} className="p-1.5 text-gray-400 hover:text-blue-600 bg-white rounded-md shadow-sm border border-gray-100"><Edit2 className="w-4 h-4" /></button>
                             <button onClick={() => handleDelete(eg.id)} className="p-1.5 text-gray-400 hover:text-red-600 bg-white rounded-md shadow-sm border border-gray-100"><Trash2 className="w-4 h-4" /></button>
@@ -564,7 +574,7 @@ export default function EgresosPage() {
             <h4 className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
                <DollarSign className="w-4 h-4 text-green-400" /> Presupuesto Ejecutado Total
             </h4>
-            <p className="text-3xl font-black text-white tracking-tight">${Math.round(egresos.reduce((acc, curr) => acc + curr.valor, 0)).toLocaleString()}</p>
+            <p className="text-3xl font-black text-white tracking-tight">{formatCOP(egresos.reduce((acc, curr) => acc + (curr.valor || 0), 0))}</p>
           </div>
 
           <div className="card-agro space-y-3">
@@ -575,7 +585,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-emerald-800">Costos de Producción</p>
                 <p className="text-xs text-emerald-600">Siembra, fertilizantes, mano obra</p>
               </div>
-              <p className="text-sm font-black text-emerald-900">${Math.round(totalesPorClasificacion['Costo de Producción']).toLocaleString()}</p>
+              <p className="text-sm font-black text-emerald-900">{formatCOP(totalesPorClasificacion['Costo de Producción'])}</p>
             </div>
 
             <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
@@ -583,7 +593,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-blue-800">Gastos Administrativos</p>
                 <p className="text-xs text-blue-600">Arriendos, honorarios, servicios</p>
               </div>
-              <p className="text-sm font-black text-blue-900">${Math.round(totalesPorClasificacion['Gasto Administrativo']).toLocaleString()}</p>
+              <p className="text-sm font-black text-blue-900">{formatCOP(totalesPorClasificacion['Gasto Administrativo'])}</p>
             </div>
 
             <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex justify-between items-center">
@@ -591,7 +601,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-purple-800">Gastos Financieros</p>
                 <p className="text-xs text-purple-600">Intereses, comisiones bancarias</p>
               </div>
-              <p className="text-sm font-black text-purple-900">${Math.round(totalesPorClasificacion['Gasto Financiero']).toLocaleString()}</p>
+              <p className="text-sm font-black text-purple-900">{formatCOP(totalesPorClasificacion['Gasto Financiero'])}</p>
             </div>
 
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 flex justify-between items-center">
@@ -599,7 +609,7 @@ export default function EgresosPage() {
                 <p className="text-xs font-bold text-amber-800">Gastos de Ventas</p>
                 <p className="text-xs text-amber-600">Fletes, transporte, empaques</p>
               </div>
-              <p className="text-sm font-black text-amber-900">${Math.round(totalesPorClasificacion['Gasto de Ventas']).toLocaleString()}</p>
+              <p className="text-sm font-black text-amber-900">{formatCOP(totalesPorClasificacion['Gasto de Ventas'])}</p>
             </div>
           </div>
         </div>
