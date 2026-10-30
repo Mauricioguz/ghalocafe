@@ -50,6 +50,53 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [categoryViewMode, setCategoryViewMode] = useState<'donut' | 'list'>('donut');
+
+  const processedCostosCategoria = React.useMemo(() => {
+    const raw = stats?.costos_por_categoria;
+    if (!raw || !Array.isArray(raw) || raw.length === 0) {
+      return { chartData: [], allSorted: [], total: 0 };
+    }
+    
+    const allSorted = [...raw]
+      .map((item: any) => ({
+        category: (item.category || item.name || 'Sin categoría').trim(),
+        value: Number(item.value || item.total || 0)
+      }))
+      .filter((item: any) => item.value > 0)
+      .sort((a, b) => b.value - a.value);
+
+    const total = allSorted.reduce((acc, curr) => acc + curr.value, 0);
+
+    if (allSorted.length <= 6) {
+      const chartData = allSorted.map((item, idx) => ({
+        ...item,
+        percent: total > 0 ? (item.value / total) * 100 : 0,
+        color: COLORS_CAT[idx % COLORS_CAT.length]
+      }));
+      return { chartData, allSorted, total };
+    }
+
+    const top5 = allSorted.slice(0, 5);
+    const rest = allSorted.slice(5);
+    const restValue = rest.reduce((acc, curr) => acc + curr.value, 0);
+
+    const chartData = [
+      ...top5.map((item, idx) => ({
+        ...item,
+        percent: total > 0 ? (item.value / total) * 100 : 0,
+        color: COLORS_CAT[idx % COLORS_CAT.length]
+      })),
+      {
+        category: `Otras (${rest.length})`,
+        value: restValue,
+        percent: total > 0 ? (restValue / total) * 100 : 0,
+        color: '#64748B'
+      }
+    ];
+
+    return { chartData, allSorted, total };
+  }, [stats?.costos_por_categoria]);
 
   const loadStats = async () => {
     setLoading(true);
@@ -257,7 +304,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Costos por Rubro Contable (P&G) */}
-        <div className="card-agro-premium flex flex-col h-[320px]">
+        <div className="card-agro-premium flex flex-col h-[340px]">
           <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
             <PieChartIcon className="w-5 h-5 text-blue-600" />
             Estructura por Rubro Contable (P&G)
@@ -286,38 +333,110 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Costos por Categoria */}
-        <div className="card-agro-premium flex flex-col h-[320px]">
-           <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
-            <PieChartIcon className="w-5 h-5 text-emerald-600" />
-            Distribución por Categoría Operativa
-          </h3>
-          <div className="flex-1">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats?.costos_por_categoria}
-                  cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={75}
-                  paddingAngle={5}
-                  dataKey="value" nameKey="category"
-                >
-                  {stats?.costos_por_categoria?.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS_CAT[index % COLORS_CAT.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(val: any) => [`$${Math.round(Number(val) || 0).toLocaleString()}`, 'Monto']}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
-                />
-                <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '11px' }} />
-              </PieChart>
-            </ResponsiveContainer>
+        {/* Costos por Categoria - Optimizado y Resumido */}
+        <div className="card-agro-premium flex flex-col h-[340px]">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
+              <PieChartIcon className="w-5 h-5 text-emerald-600" />
+              <span>Distribución por Categoría</span>
+            </h3>
+            
+            {/* Selector de modo: Resumen (Top 5) vs Todo */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+              <button
+                type="button"
+                onClick={() => setCategoryViewMode('donut')}
+                className={`px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                  categoryViewMode === 'donut' 
+                    ? 'bg-white text-emerald-700 shadow-xs' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="Ver gráfica resumida (Top 5 + Otras)"
+              >
+                Top 5
+              </button>
+              <button
+                type="button"
+                onClick={() => setCategoryViewMode('list')}
+                className={`px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                  categoryViewMode === 'list' 
+                    ? 'bg-white text-emerald-700 shadow-xs' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="Ver todas las categorías en lista detallada con ranking"
+              >
+                Todas ({processedCostosCategoria.allSorted.length})
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 min-h-0 relative">
+            {categoryViewMode === 'donut' ? (
+              <div className="w-full h-full flex flex-col">
+                <div className="flex-1 min-h-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart margin={{ top: 0, bottom: 25, left: 0, right: 0 }}>
+                      <Pie
+                        data={processedCostosCategoria.chartData}
+                        cx="50%" cy="45%"
+                        innerRadius={50} outerRadius={72}
+                        paddingAngle={3}
+                        dataKey="value" nameKey="category"
+                      >
+                        {processedCostosCategoria.chartData.map((entry: any, index: number) => (
+                          <Cell key={`cell-cat-${index}`} fill={entry.color || COLORS_CAT[index % COLORS_CAT.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(val: any, name: any, item: any) => {
+                          const p = item?.payload?.percent ? ` (${item.payload.percent.toFixed(1)}%)` : '';
+                          return [formatCOP(Number(val) || 0) + p, 'Monto'];
+                        }}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
+                      />
+                      <Legend 
+                        layout="horizontal" 
+                        verticalAlign="bottom" 
+                        align="center" 
+                        wrapperStyle={{ fontSize: '10.5px', lineHeight: '14px', paddingTop: '6px' }} 
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ) : (
+              /* Vista Lista Detallada con Ranking y Scroll */
+              <div className="w-full h-full overflow-y-auto pr-1.5 space-y-2 text-xs">
+                {processedCostosCategoria.allSorted.map((item: any, idx: number) => {
+                  const pct = processedCostosCategoria.total > 0 ? (item.value / processedCostosCategoria.total) * 100 : 0;
+                  return (
+                    <div key={`cat-item-${idx}`} className="p-2 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100/80 transition-colors">
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="font-semibold text-slate-800 flex items-center gap-1.5 truncate max-w-[65%]">
+                          <span className="text-[10px] font-bold text-slate-400">#{idx + 1}</span>
+                          <span className="truncate" title={item.category}>{item.category}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-bold text-slate-900">${Math.round(item.value).toLocaleString()}</span>
+                          <span className="text-[10px] text-emerald-600 font-semibold ml-1.5">({pct.toFixed(1)}%)</span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-slate-200/70 rounded-full h-1.5 overflow-hidden">
+                        <div 
+                          className="bg-emerald-500 h-1.5 rounded-full" 
+                          style={{ width: `${Math.max(3, Math.min(100, pct))}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Rentabilidad por Producto */}
-        <div className="card-agro-premium h-[320px] flex flex-col">
+        <div className="card-agro-premium h-[340px] flex flex-col">
           <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-800">
             <Activity className="w-5 h-5 text-amber-500" />
             Rentabilidad por Producto
